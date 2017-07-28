@@ -55,13 +55,19 @@ args.nscenarios = N_SCENARIOS
 args.ncomparisons = mcc.pairwise_comparisons_count(N_SCENARIOS)
 args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
 
-#Basically we just write a new bootstrap function for what ever type of comparison
-#we want to do.  Then assign it to args.boot_function
-#compare correlated scenarios using mean differences
 args.boot_function = bs.boot_dep_mean_diff   
-args.comp_function = bs.confidence_interval
+
+#Basically we just write a new function for what ever type of comparison
+#we want to do.  Then assign it to args.comp_function
+#At the moment there are two:
+#Bootstrap.percentile_confidence_interval(data, args)
+#Bootstrap.proportion_x2_greaterthan_x1(data, args) - is this what you wanted?
+    
+args.comp_function = bs.percentile_confidence_interval
+#args.comp_function = bs.proportion_x2_greaterthan_x1
 
 results = bs.compare_scenarios_pairwise(scenario_data, args)
 
 #the output at this point at percentile CIs (bonferroni adjusted)
 print(results)
+#need to think about a way to display results cleanly.

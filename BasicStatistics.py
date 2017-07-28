@@ -14,6 +14,8 @@ def mean(data):
     
     """
     #return math.fsum(i for i in data)/len(data)
+    #note: math.fsum offers better precision for floating point arthimetic
+    #sum(data) is faster!
     return sum(data)/len(data)
    
 

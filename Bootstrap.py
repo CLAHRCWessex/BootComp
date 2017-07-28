@@ -123,7 +123,7 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
 
 
 
-def confidence_interval(data, args):
+def percentile_confidence_interval(data, args):
     """
     100(1-alpha) confidence interval using percentile method
     
@@ -142,11 +142,15 @@ def confidence_interval(data, args):
 
 def proportion_x2_greaterthan_x1(data, args):
     """
+    The number of bootstraps where the comparator was bigger than the control
+    Really not sure what to call this procedure!  
+    Rename to something more intuitive.
+    
     @data: the bootstrapped mean differences
     @args: bootstrap arguments (utility class)
     
     """
-    pass
+    return sum(x < 0 for x in data)/args.nboots
 
 
 def boot_mean_diff(data1, data2):
