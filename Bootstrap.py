@@ -10,8 +10,8 @@ Implemented as a set of simple list comprehensions.
 
 
 import numpy as np
-from System import Random 
-rnd = Random()
+#what is faster statistics.mean or np.mean?
+from statistics import mean
 
 
 class BootstrapArguments:
@@ -49,7 +49,7 @@ class reporter(object):
 	
     def report(self, args):
         args.lw_complete += 1.0
-        args.worker.ReportProgress((args.lw_complete / args.ncomparisons) * 100.0)
+        #args.worker.ReportProgress((args.lw_complete / args.ncomparisons) * 100.0)
 
 		
 DECIMAL_PLACES = 1
@@ -71,6 +71,8 @@ def compare_scenarios_pairwise(scenarios, args):
     """
     args.lw_complete = 0
 	
+    
+    
     return [compare_scenarios_listwise(scenarios[i], scenarios[i+1:], args)
                for i in range(len(scenarios) - 1)]
                
@@ -108,6 +110,7 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     @first_scenario - first scenario replication data;
     @second_scenario - second scenario replication data;
     """
+    
     diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
     return confidence_interval(diffs, args)
 
@@ -149,7 +152,7 @@ def bootstrap_mean(data):
     """
     Computes the mean of a bootstrap sample
     """
-    return np.mean(boot(data, resample(len(data))))
+    return mean(boot(data, resample(len(data))))
 
 
  
@@ -172,8 +175,10 @@ def resample(n):
     0 and n - 1
     
     @n : number of random intergers to generate
+    
     """
-    x = [rnd.Next(0,n-1) for i in range(n)]
+    x = [round(np.random.uniform(0, n-1)) for i in range(n)]
+        
     return x
 		
 	
@@ -194,11 +199,11 @@ def bootstrap_mean2(data, indexes):
     """
     Computes the mean of a bootstrap sample
     
-    20170727 TM Notes: Not really sure why I wrote two bootstrap_mean functions?
+    20170727 TM Notes: Not completely sure why I wrote two bootstrap_mean functions?
     This is the one that is used when assuming dependence.  bootstrap_mean used when assuming independence
     
     Refactor to single function?
     """
-    return np.mean(boot(data, indexes))
+    return mean(boot(data, indexes))
 
 
