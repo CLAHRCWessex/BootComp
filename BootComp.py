@@ -4,9 +4,18 @@ Simple bootstrap routine to compare multiple scenarios
 
 Notes: 
     
-This seems a lot slower in CPython compared to IronPython and .net.
-Use numpy ndarray's for performance increase?
-Need to profile code.
+Discrepency in performance between IronPython.Net and CPython was down
+to calculation of the mean of n bootstraps.  
+
+Examplanation: 
+data = [1, 2, 3, 4, 5, 6, 7, 9]
+statistics.mean(data) = 86ms 
+np.mean(mean) = 44.8 ms
+np.array(data).mean = 5.74 ms
+math.fsum(data)/len(data) = 1.86 ms
+sum(data)/len(data) = 1.24 ms
+
+fsum(data) potentially has great precision in floating point arithm than sum(data)
 
 """
 
@@ -17,8 +26,8 @@ import MCC as mcc
 import ConvFuncs as cf
 
 CONFIDENCE = 95
-N_BOOTS = 10
-N_SCENARIOS = 12
+N_BOOTS = 100
+N_SCENARIOS = 12  #get number of scenarios from file?
 
 def load_scenarios(file_name):
     """
@@ -50,6 +59,7 @@ args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
 #we want to do.  Then assign it to args.boot_function
 #compare correlated scenarios using mean differences
 args.boot_function = bs.boot_dep_mean_diff   
+args.comp_function = bs.confidence_interval
 
 results = bs.compare_scenarios_pairwise(scenario_data, args)
 

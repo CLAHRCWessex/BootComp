@@ -13,6 +13,8 @@ import numpy as np
 #what is faster statistics.mean or np.mean?
 from statistics import mean
 
+import BasicStatistics as bs
+
 
 class BootstrapArguments:
     """
@@ -24,6 +26,7 @@ class BootstrapArguments:
         nboots: number of bootstraps
         confidence: alpha confidence level
         bootfunction:  the bootstrap function selected (dependent or independent)
+        comparisonfunction: the comparison function selelcted (e.g. percentile CIs)
         nscenarios: number of scenarios
         ncomparisons: number of comparisons (depending on pariwise or listwise)    
     
@@ -112,7 +115,7 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     """
     
     diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
-    return confidence_interval(diffs, args)
+    return args.comp_function(diffs, args)
 
 
 
@@ -136,7 +139,14 @@ def confidence_interval(data, args):
 
     return [round(data[lower], DECIMAL_PLACES), round(data[upper], DECIMAL_PLACES)]
     
+
+def proportion_x2_greaterthan_x1(data, args):
+    """
+    @data: the bootstrapped mean differences
+    @args: bootstrap arguments (utility class)
     
+    """
+    pass
 
 
 def boot_mean_diff(data1, data2):
@@ -193,7 +203,17 @@ def boot_dep_mean_diff(data1, data2):
     indexes = resample(len(data1))
     return bootstrap_mean2(data1, indexes) - bootstrap_mean2(data2, indexes)
 	
+
 	
+def boot_dep_x2_greater_than_x1(data1, data2):
+    """
+    Bootstraps dependent means and returns true/false
+    if x2 is > x1
+    """
+    indexes = resample(len(data1))
+    return bootstrap_mean2(data2, indexes) > bootstrap_mean2(data1, indexes)
+	
+
 
 def bootstrap_mean2(data, indexes):
     """
@@ -203,7 +223,10 @@ def bootstrap_mean2(data, indexes):
     This is the one that is used when assuming dependence.  bootstrap_mean used when assuming independence
     
     Refactor to single function?
+    
+    Uses numpy.mean over statistics.mean as appears to be more efficient.
     """
-    return mean(boot(data, indexes))
+    
+    return bs.mean(boot(data, indexes))
 
 
