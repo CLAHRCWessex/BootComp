@@ -45,6 +45,25 @@ def load_scenarios(file_name):
         return columns
 
 
+def display_comparison_results(results):
+    """
+    Displays the comparison in a readable format
+    @results.  List of lists containing comparison results
+    """
+    scenario = 1
+    comp = 2
+    
+    for lists in results:
+        print("Scenario {0}".format(scenario))
+        comp = scenario + 1
+        
+        scenario += 1
+        
+        for interval in lists:
+            print("Vs. {0}: {1}".format(comp, interval))
+            comp += 1
+
+
 #note BootStrap routines require lists of lists
 scenario_data = cf.list_of_lists(load_scenarios("data/scenarios.csv"))
 
@@ -67,7 +86,6 @@ args.comp_function = bs.percentile_confidence_interval
 #args.comp_function = bs.proportion_x2_greaterthan_x1
 
 results = bs.compare_scenarios_pairwise(scenario_data, args)
+     
 
-#the output at this point at percentile CIs (bonferroni adjusted)
-print(results)
-#need to think about a way to display results cleanly.
+display_comparison_results(results)
