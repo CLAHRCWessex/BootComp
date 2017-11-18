@@ -205,6 +205,7 @@ def boot_dep_mean_diff(data1, data2):
         
     """
     indexes = resample(len(data1))
+        
     return bootstrap_mean2(data1, indexes) - bootstrap_mean2(data2, indexes)
 	
 
