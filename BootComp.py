@@ -31,8 +31,9 @@ import ConvFuncs as cf
 import output as out
 
 CONFIDENCE = 95
-N_BOOTS = 100
-N_SCENARIOS = 5  #get number of scenarios from file?
+N_BOOTS = 1000
+N_SCENARIOS = 5  #get number of scenarios from file?  ToDo!!!!
+INPUT_DATA = "data/mini_scenarios.csv"
 
 def load_scenarios(file_name):
     """
@@ -51,7 +52,7 @@ def load_scenarios(file_name):
 
 
 #note BootStrap routines require lists of lists
-scenario_data = cf.list_of_lists(load_scenarios("data/mini_scenarios.csv"))
+scenario_data = cf.list_of_lists(load_scenarios(INPUT_DATA))
 print("loaded data")
 
 args =  bs.BootstrapArguments()
@@ -71,15 +72,16 @@ args.boot_function = bs.boot_dep_mean_diff
     
 #args.comp_function = bs.percentile_confidence_interval
 args.comp_function = bs.proportion_x2_greaterthan_x1
+#args.comp_function = bs.plot_boostrap_samples # use this to product charts instead
 
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(scenario_data, args)
      
-out.print_long_format_comparison_results(results)
-out.write_long_format_comparison_results(results)
+#out.print_long_format_comparison_results(results)
+#out.write_long_format_comparison_results(results)
 
-matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
-out.print_results_matrix(matrix, N_SCENARIOS)
-out.write_results_matrix(matrix, N_SCENARIOS) #only works if proportion comparison performed!
+#matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
+#out.print_results_matrix(matrix, N_SCENARIOS)
+#out.write_results_matrix(matrix, N_SCENARIOS) #only works if proportion comparison performed!
 
 

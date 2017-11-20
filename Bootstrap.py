@@ -10,10 +10,12 @@ Implemented as a set of simple list comprehensions.
 
 
 import numpy as np
-#what is faster statistics.mean or np.mean?
-from statistics import mean
+import matplotlib as mlab
+import matplotlib.pyplot as plt
 
 import BasicStatistics as bs
+
+
 
 
 class BootstrapArguments:
@@ -153,6 +155,20 @@ def proportion_x2_greaterthan_x1(data, args):
     return sum(x < 0 for x in data)/args.nboots
 
 
+def plot_boostrap_samples(data, args):
+    # the histogram of the data
+    n, bins, patches = plt.hist(data, 50, cumulative = True, normed=1, linewidth=1.5, histtype='step', facecolor='green', alpha=0.75)
+    
+    plt.xlabel('Mean difference')
+    plt.ylabel('Probability')
+    
+   
+    
+    plt.axis([min(data) - 1, max(data) + 1, 0, 1])
+    plt.grid(True)
+    
+    plt.show()
+
 def boot_mean_diff(data1, data2):
     """
     Computes the mean difference of bootstap samples
@@ -166,8 +182,7 @@ def bootstrap_mean(data):
     """
     Computes the mean of a bootstrap sample
     """
-    return sum(boot(data, resample(len(data))))/len(data) 
-   
+    return bs.mean(boot(data, resample(len(data))))
 
  
 
@@ -232,7 +247,6 @@ def bootstrap_mean2(data, indexes):
     Uses numpy.mean over statistics.mean as appears to be more efficient.
     """
     
-    #return bs.mean(boot(data, indexes))
-    return sum(boot(data, indexes))/len(data) 
-
+    return bs.mean(boot(data, indexes))
+    
 

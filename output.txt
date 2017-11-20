@@ -1,10 +1,10 @@
 Scenario 1
-Vs. 2: 0.0
-Vs. 3: 0.38
+Vs. 2: 0.01
+Vs. 3: 0.36
 Vs. 4: 1.0
 Vs. 5: 1.0
 Scenario 2
-Vs. 3: 0.96
+Vs. 3: 0.98
 Vs. 4: 1.0
 Vs. 5: 1.0
 Scenario 3
