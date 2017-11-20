@@ -166,8 +166,8 @@ def bootstrap_mean(data):
     """
     Computes the mean of a bootstrap sample
     """
-    return mean(boot(data, resample(len(data))))
-
+    return sum(boot(data, resample(len(data))))/len(data) 
+   
 
  
 
@@ -232,6 +232,7 @@ def bootstrap_mean2(data, indexes):
     Uses numpy.mean over statistics.mean as appears to be more efficient.
     """
     
-    return bs.mean(boot(data, indexes))
+    #return bs.mean(boot(data, indexes))
+    return sum(boot(data, indexes))/len(data) 
 
 

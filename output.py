@@ -7,6 +7,44 @@ Created on Sun Jul 30 11:51:07 2017
 
 import csv
 
+def print_long_format_comparison_results(results):
+    """
+    Displays the comparison in a readable format
+    @results.  List of lists containing comparison results
+    """
+    scenario = 1
+    comp = 2
+    
+    for lists in results:
+        print("Scenario {0}".format(scenario))
+        comp = scenario + 1  
+        scenario += 1
+        
+        for interval in lists:
+            print("Vs. {0}: {1}".format(comp, interval))
+            comp += 1
+            
+            
+def write_long_format_comparison_results(results):
+    """
+    Outputs the comparison in a readable format to file
+    @results.  List of lists containing comparison results
+    """
+    scenario = 1
+    comp = 2
+    
+    with open("output.txt", "w") as outfile:
+        
+        for lists in results:
+            outfile.write("Scenario {0}\n".format(scenario))
+            comp = scenario + 1  
+            scenario += 1
+            
+            for interval in lists:
+                outfile.write("Vs. {0}: {1}\n".format(comp, interval))
+                comp += 1            
+
+
 def write_results_matrix(matrix, n_scenarios):
     """
     Converts scenario comparison results to matrix format.
