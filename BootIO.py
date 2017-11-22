@@ -8,6 +8,20 @@ Created on Sun Jul 30 11:51:07 2017
 import csv
 
 
+def load_scenarios(file_name):
+    """
+    Reads scenario data from a .csv file (assumes comma delimited).  
+    Assumes that each column represents a scenario.
+    Returns a list of tuples.  Each tuple are the replications from each
+    scenario
+
+    """
+    
+    with open(file_name, 'r') as csvfile:
+
+        c_reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
+        columns = list(zip(*c_reader))
+        return columns
 
 
 def print_long_format_comparison_results(results):
@@ -89,7 +103,7 @@ def results_to_matrix(results):
     return matrix
 
 
-def print_results_matrix(matrix, n_scenarios, decimal_places = 2):
+def print_results_matrix(matrix, n_scenarios):
     """
     Screen print of comparison results in matrix form.  Not nice
     for large comparisons. 
@@ -97,23 +111,13 @@ def print_results_matrix(matrix, n_scenarios, decimal_places = 2):
     
     headers = scenario_headers(n_scenarios)
     row_headers = scenario_row_headers(n_scenarios)
-    
-    #r_matrix = [round(x, decimal_places) for row in matrix]
-    
-    for row in matrix:
-        for i in row:
-            if i != "-":
-                i = round(i, decimal_places)
-                
-    
+                       
     row_format ="{:>10}" * (len(headers)+1)
     print(row_format.format("", *headers))
     for scenario, row in zip(row_headers, matrix):
         print(row_format.format(scenario, *row ))
         
-      
-        
-                
+       
             
 def scenario_headers(n_scenarios):
     """

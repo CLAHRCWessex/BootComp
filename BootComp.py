@@ -23,35 +23,19 @@ Possibly more performance on offer if data is already in a numpy array.
 
 """
 
-import csv
 
 import Bootstrap as bs
+import BootIO as io
 import MCC as mcc
 import ConvFuncs as cf
-import output as out
 
 CONFIDENCE = 95
 N_BOOTS = 1000
 INPUT_DATA = "data/mini_scenarios.csv"
 
-def load_scenarios(file_name):
-    """
-    Reads scenario data from a .csv file (assumes comma delimited).  
-    Assumes that each column represents a scenario.
-    Returns a list of tuples.  Each tuple are the replications from each
-    scenario
-
-    """
-    
-    with open(file_name, 'r') as csvfile:
-
-        c_reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
-        columns = list(zip(*c_reader))
-        return columns
-
 
 #note BootStrap routines require lists of lists
-scenario_data = cf.list_of_lists(load_scenarios(INPUT_DATA))
+scenario_data = cf.list_of_lists(io.load_scenarios(INPUT_DATA))
 N_SCENARIOS = len(scenario_data)
 print("Loaded data. {0} scenarios".format(N_SCENARIOS))
 
@@ -80,11 +64,11 @@ args.comp_function = bs.proportion_x2_greaterthan_x1
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(scenario_data, args)
      
-out.print_long_format_comparison_results(results)
+io.print_long_format_comparison_results(results)
 #out.write_long_format_comparison_results(results)
 
 matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
-out.print_results_matrix(matrix, N_SCENARIOS)
-out.write_results_matrix(matrix, N_SCENARIOS) #only works if proportion comparison performed!
+io.print_results_matrix(matrix, N_SCENARIOS)
+io.write_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 
