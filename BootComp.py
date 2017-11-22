@@ -57,18 +57,18 @@ args.boot_function = bs.boot_dep_mean_diff
 #Bootstrap.plot_boostrap_samples_pdf(data, args)
 #Bootstrap.plot_boostrap_samples_cdf(data, args)
     
-#args.comp_function = bs.percentile_confidence_interval
-args.comp_function = bs.proportion_x2_greaterthan_x1
+args.comp_function = bs.percentile_confidence_interval
+#args.comp_function = bs.proportion_x2_greaterthan_x1
 #args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(scenario_data, args)
      
 io.print_long_format_comparison_results(results)
-#out.write_long_format_comparison_results(results)
+#io.write_long_format_comparison_results(results)
 
-matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
-io.print_results_matrix(matrix, N_SCENARIOS)
+matrix = io.results_to_matrix(results) #only works if proportion comparison performed!
+#io.print_results_matrix(matrix, N_SCENARIOS)
 io.write_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 
