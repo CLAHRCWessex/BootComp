@@ -57,7 +57,7 @@ class reporter(object):
         #args.worker.ReportProgress((args.lw_complete / args.ncomparisons) * 100.0)
 
 		
-DECIMAL_PLACES = 1
+DECIMAL_PLACES = 2
 
 
 #
@@ -152,17 +152,27 @@ def proportion_x2_greaterthan_x1(data, args):
     @args: bootstrap arguments (utility class)
     
     """
-    return sum(x < 0 for x in data)/args.nboots
+    return round(sum(x < 0 for x in data)/args.nboots, DECIMAL_PLACES)
 
 
-def plot_boostrap_samples(data, args):
+def plot_boostrap_samples_cdf(data, args):
     # the histogram of the data
     n, bins, patches = plt.hist(data, 50, cumulative = True, normed=1, linewidth=1.5, histtype='step', facecolor='green', alpha=0.75)
     
     plt.xlabel('Mean difference')
-    plt.ylabel('Probability')
+    plt.ylabel('Cumulative Probability')
     
-   
+    plt.axis([min(data) - 1, max(data) + 1, 0, 1])
+    plt.grid(True)
+    
+    plt.show()
+    
+def plot_boostrap_samples_pdf(data, args):
+    # the histogram of the data
+    n, bins, patches = plt.hist(data, 50, normed=1, facecolor='green', alpha=0.75)
+    
+    plt.xlabel('Mean difference')
+    plt.ylabel('Cumulative Probability')
     
     plt.axis([min(data) - 1, max(data) + 1, 0, 1])
     plt.grid(True)

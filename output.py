@@ -7,6 +7,9 @@ Created on Sun Jul 30 11:51:07 2017
 
 import csv
 
+
+
+
 def print_long_format_comparison_results(results):
     """
     Displays the comparison in a readable format
@@ -86,7 +89,7 @@ def results_to_matrix(results):
     return matrix
 
 
-def print_results_matrix(matrix, n_scenarios):
+def print_results_matrix(matrix, n_scenarios, decimal_places = 2):
     """
     Screen print of comparison results in matrix form.  Not nice
     for large comparisons. 
@@ -95,10 +98,18 @@ def print_results_matrix(matrix, n_scenarios):
     headers = scenario_headers(n_scenarios)
     row_headers = scenario_row_headers(n_scenarios)
     
+    #r_matrix = [round(x, decimal_places) for row in matrix]
+    
+    for row in matrix:
+        for i in row:
+            if i != "-":
+                i = round(i, decimal_places)
+                
+    
     row_format ="{:>10}" * (len(headers)+1)
     print(row_format.format("", *headers))
     for scenario, row in zip(row_headers, matrix):
-        print(row_format.format(scenario, *row))
+        print(row_format.format(scenario, *row ))
         
       
         

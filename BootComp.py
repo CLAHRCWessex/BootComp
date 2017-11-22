@@ -32,7 +32,6 @@ import output as out
 
 CONFIDENCE = 95
 N_BOOTS = 1000
-N_SCENARIOS = 5  #get number of scenarios from file?  ToDo!!!!
 INPUT_DATA = "data/mini_scenarios.csv"
 
 def load_scenarios(file_name):
@@ -53,7 +52,8 @@ def load_scenarios(file_name):
 
 #note BootStrap routines require lists of lists
 scenario_data = cf.list_of_lists(load_scenarios(INPUT_DATA))
-print("loaded data")
+N_SCENARIOS = len(scenario_data)
+print("Loaded data. {0} scenarios".format(N_SCENARIOS))
 
 args =  bs.BootstrapArguments()
 args.nboots = N_BOOTS
@@ -66,22 +66,25 @@ args.boot_function = bs.boot_dep_mean_diff
 
 #Basically we just write a new function for what ever type of comparison
 #we want to do.  Then assign it to args.comp_function
-#At the moment there are two:
-#Bootstrap.percentile_confidence_interval(data, args)
-#Bootstrap.proportion_x2_greaterthan_x1(data, args) - is this what you wanted?
+#This could be modified to complete multiple actions i.e. percentile intervals and probabilities
+#Functions are:
+#Bootstrap.percentile_confidence_interval(data, args) 
+#Bootstrap.proportion_x2_greaterthan_x1(data, args) 
+#Bootstrap.plot_boostrap_samples_pdf(data, args)
+#Bootstrap.plot_boostrap_samples_cdf(data, args)
     
 #args.comp_function = bs.percentile_confidence_interval
 args.comp_function = bs.proportion_x2_greaterthan_x1
-#args.comp_function = bs.plot_boostrap_samples # use this to product charts instead
+#args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(scenario_data, args)
      
-#out.print_long_format_comparison_results(results)
+out.print_long_format_comparison_results(results)
 #out.write_long_format_comparison_results(results)
 
-#matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
-#out.print_results_matrix(matrix, N_SCENARIOS)
-#out.write_results_matrix(matrix, N_SCENARIOS) #only works if proportion comparison performed!
+matrix = out.results_to_matrix(results) #only works if proportion comparison performed!
+out.print_results_matrix(matrix, N_SCENARIOS)
+out.write_results_matrix(matrix, N_SCENARIOS) #only works if proportion comparison performed!
 
 
