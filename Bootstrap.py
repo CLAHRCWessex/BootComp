@@ -98,6 +98,7 @@ def compare_scenarios_listwise(control, scenarios, args):
     @args.bootfunction:  the bootstrap function selected (dependent or independent)
     @args.nscenarios: number of scenarios
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
+    @args.comp_function: the method of comparison e.g. percentile or probability x > y
     """
     return [compare_two_scenarios(control, scenarios[i], args) for i in range(len(scenarios))]
     
@@ -120,6 +121,18 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     return args.comp_function(diffs, args)
 
 
+def compare_two_scenarios2(first_scenario, second_scenario, args):
+    """
+    Compare two scenarios using the list of comparison functions
+    
+    @first_scenario - first scenario replication data;
+    @second_scenario - second scenario replication data;
+    @args.comp_functions - a list of comparison functions to use. 
+    """
+    
+    diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
+    return [func(diffs, args) for func in args.comp_functions]
+    
 
 
 

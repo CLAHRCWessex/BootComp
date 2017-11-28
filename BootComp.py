@@ -7,8 +7,6 @@ Notes:
 Discrepency in performance between IronPython.Net and CPython was down
 to calculation of the mean of n bootstraps.  
 
-
-
 Explanation: 
 data = [1, 2, 3, 4, 5, 6, 7, 9]
 statistics.mean(data) = 86ms 
@@ -30,9 +28,8 @@ import MCC as mcc
 import ConvFuncs as cf
 
 CONFIDENCE = 95
-N_BOOTS = 1000
-INPUT_DATA = "data/mini_scenarios.csv"
-
+N_BOOTS = 500
+INPUT_DATA = "data/real_scenarios.csv"
 
 #note BootStrap routines require lists of lists
 scenario_data = cf.list_of_lists(io.load_scenarios(INPUT_DATA))
@@ -57,18 +54,34 @@ args.boot_function = bs.boot_dep_mean_diff
 #Bootstrap.plot_boostrap_samples_pdf(data, args)
 #Bootstrap.plot_boostrap_samples_cdf(data, args)
     
-args.comp_function = bs.percentile_confidence_interval
+#args.comp_function = bs.percentile_confidence_interval
+args.comp_function = bs.proportion_x2_greaterthan_x1
+#args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
+
+args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence_interval]
+
 #args.comp_function = bs.proportion_x2_greaterthan_x1
 #args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
+
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(scenario_data, args)
-     
-io.print_long_format_comparison_results(results)
+
+
+    
+#io.print_long_format_comparison_results(results)
 #io.write_long_format_comparison_results(results)
 
-matrix = io.results_to_matrix(results) #only works if proportion comparison performed!
-#io.print_results_matrix(matrix, N_SCENARIOS)
-io.write_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+#print(results)
 
+matrix = io.results_to_matrix(results) 
+#print(matrix)
+#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+
+io.insert_inverse_results(matrix, N_SCENARIOS)
+#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+
+io.write_results_matrix(matrix, N_SCENARIOS) 
+
+print("Bootstrap analysis complete.")
 

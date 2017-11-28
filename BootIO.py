@@ -90,18 +90,37 @@ def results_to_matrix(results):
     Includes "-" for comparisons that are N/A
     """
 
-    matrix = [['-' for i in range(len(results))] for j in results]
-   
+    matrix = [['-' for i in range(len(results)+1)] for j in results]
+    matrix.append(['-' for i in range(len(results)+1)])
         
     #loop through results and add to matrix
     for i in range(len(results)):
         k = 0
         for j in range(len(results[i])):
-            matrix[i][i+j] = results[i][k]
+            matrix[i][i+j+1] = results[i][k]
             k+= 1
+            
+    #add the inverse results to the matrix
+    
     
     return matrix
 
+
+def insert_inverse_results(matrix, n_scenarios):
+      
+    for col in range(len(matrix[0])):
+        for row in range(col+1, len(matrix[0])):
+            if(matrix[col][row] != '-'):
+                matrix[row][col] = round(1 - matrix[col][row], 2)
+                
+    
+                
+           
+    
+    
+    
+        
+    
 
 def print_results_matrix(matrix, n_scenarios):
     """
@@ -112,7 +131,7 @@ def print_results_matrix(matrix, n_scenarios):
     headers = scenario_headers(n_scenarios)
     row_headers = scenario_row_headers(n_scenarios)
                        
-    row_format ="{:>10}" * (len(headers)+1)
+    row_format ="{:>8}" * (len(headers)+1)
     print(row_format.format("", *headers))
     for scenario, row in zip(row_headers, matrix):
         print(row_format.format(scenario, *row ))
@@ -123,7 +142,7 @@ def scenario_headers(n_scenarios):
     """
     Returns a list representing headers in a results matrix
     """
-    return ["S{0}".format(i) for i in range(2, n_scenarios+1)]
+    return ["S{0}".format(i) for i in range(1, n_scenarios+1)]
     
 
 
@@ -131,7 +150,7 @@ def scenario_row_headers(n_scenarios):
     """
     Returns a list representing headers in a results matrix
     """
-    return ["S{0}".format(i) for i in range(1, n_scenarios)]
+    return ["S{0}".format(i) for i in range(1, n_scenarios+1)]
 
 
 
