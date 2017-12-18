@@ -28,8 +28,8 @@ import MCC as mcc
 import ConvFuncs as cf
 
 CONFIDENCE = 95
-N_BOOTS = 500
-INPUT_DATA = "data/real_scenarios.csv"
+N_BOOTS = 1000
+INPUT_DATA = "data/mini_scenarios.csv"
 
 #note BootStrap routines require lists of lists
 scenario_data = cf.list_of_lists(io.load_scenarios(INPUT_DATA))
@@ -42,8 +42,8 @@ args.nscenarios = N_SCENARIOS
 args.ncomparisons = mcc.pairwise_comparisons_count(N_SCENARIOS)
 args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
 
-args.boot_function = bs.boot_dep_mean_diff   
-#args.boot_function = bs.boot_mean_diff   
+#args.boot_function = bs.boot_dep_mean_diff   
+args.boot_function = bs.boot_mean_diff   
 
 #Basically we just write a new function for what ever type of comparison
 #we want to do.  Then assign it to args.comp_function
@@ -63,10 +63,13 @@ args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence
 #args.comp_function = bs.proportion_x2_greaterthan_x1
 #args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
+args.boot_function = bs.boot_mean_diff3
+r = bs.resample_all_scenarios(scenario_data, args)
+
 
 print("Running comparisons...")
-results = bs.compare_scenarios_pairwise(scenario_data, args)
-
+#results = bs.compare_scenarios_pairwise(scenario_data, args)
+results = bs.compare_scenarios_pairwise(r, args) # revised script
 
     
 #io.print_long_format_comparison_results(results)
@@ -76,12 +79,17 @@ results = bs.compare_scenarios_pairwise(scenario_data, args)
 
 matrix = io.results_to_matrix(results) 
 #print(matrix)
-#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 io.insert_inverse_results(matrix, N_SCENARIOS)
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
-io.write_results_matrix(matrix, N_SCENARIOS) 
+#io.write_results_matrix(matrix, N_SCENARIOS) 
+print("Results written to file.")
+
+
+
+
 
 print("Bootstrap analysis complete.")
 

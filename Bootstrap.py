@@ -62,6 +62,17 @@ DECIMAL_PLACES = 2
 
 #
 
+def resample_all_scenarios(scenarios, args):
+    return [resample_scenario(sc, args) for sc in scenarios]
+
+
+def resample_scenario(data, args):
+    return [bootstrap_mean(data) for i in range(args.nboots)]
+    
+    
+    
+    
+
 def compare_scenarios_pairwise(scenarios, args):
     """
     Compare all scenarios against each other
@@ -100,7 +111,7 @@ def compare_scenarios_listwise(control, scenarios, args):
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
     @args.comp_function: the method of comparison e.g. percentile or probability x > y
     """
-    return [compare_two_scenarios(control, scenarios[i], args) for i in range(len(scenarios))]
+    return [compare_two_scenarios3(control, scenarios[i], args) for i in range(len(scenarios))]
     
    
 
@@ -132,8 +143,38 @@ def compare_two_scenarios2(first_scenario, second_scenario, args):
     
     diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
     return [func(diffs, args) for func in args.comp_functions]
-    
 
+def compare_two_scenarios3(first_scenario, second_scenario, args):
+    """
+    Compare two scenarios 
+
+    @first_scenario - first scenario replication data;
+    @second_scenario - second scenario replication data;
+    """
+    
+    diffs = args.boot_function(first_scenario, second_scenario) 
+    return args.comp_function(diffs, args)
+
+
+def boot_mean_diff3(data1, data2):
+    """
+    Computes the mean difference of bootstap samples
+    Assumes independence of samples
+    """
+    return [a - b for a, b in zip(data1, data2)]
+
+
+def proportion_x2_greaterthan_x1_2(data, args):
+    """
+    The number of bootstraps where the comparator was bigger than the control
+    Really not sure what to call this procedure!  
+    Rename to something more intuitive.
+    
+    @data: the bootstrapped mean differences
+    @args: bootstrap arguments (utility class)
+    
+    """
+    return round(sum(x < 0 for x in data)/args.nboots, DECIMAL_PLACES)
 
 
 
@@ -226,7 +267,7 @@ def resample(n):
     returns a list of size n containing resampled values (integers) between
     0 and n - 1
     
-    @n : number of random intergers to generate
+    @n : number of random integers to generate
     
     """
     x = [round(np.random.uniform(0, n-1)) for i in range(n)]
