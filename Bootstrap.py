@@ -63,11 +63,27 @@ DECIMAL_PLACES = 2
 #
 
 def resample_all_scenarios(scenarios, args):
+    """
+    Create @args.nboots resamples of the test statistic from each 
+    scenario e.g. the mean
+    
+    @scenarios - the list of scenarios
+    @args - bootstrap arguments (utility class)
+    """
     return [resample_scenario(sc, args) for sc in scenarios]
 
 
 def resample_scenario(data, args):
-    return [bootstrap_mean(data) for i in range(args.nboots)]
+    """
+    Create @args.nboots resamples of a test statistic (e.g. mean) from the 
+    replication data for a scenario
+    
+    @data - replications / batch means from a scenario
+    @args - bootstrap arguments (utility class)
+    @args.boot_ts - test statistic to bootstrap e.g. mean
+    
+    """
+    return [args.boot_ts(data) for i in range(args.nboots)]
     
     
     
@@ -77,7 +93,7 @@ def compare_scenarios_pairwise(scenarios, args):
     """
     Compare all scenarios against each other
     @scenarios: the list containing scenario data
-    @args: bootstrap arguemnts (utility class)
+    @args: bootstrap arguments (utility class)
     
     @args.nboots: number of bootstraps
     @args.confidence: alpha confidence level

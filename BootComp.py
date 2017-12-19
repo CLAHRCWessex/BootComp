@@ -64,6 +64,9 @@ args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence
 #args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
 args.boot_function = bs.boot_mean_diff3
+args.boot_ts = bs.bootstrap_mean
+
+print("Resampling...")
 r = bs.resample_all_scenarios(scenario_data, args)
 
 
@@ -85,7 +88,7 @@ io.insert_inverse_results(matrix, N_SCENARIOS)
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 #io.write_results_matrix(matrix, N_SCENARIOS) 
-print("Results written to file.")
+#print("Results written to file.")
 
 
 
