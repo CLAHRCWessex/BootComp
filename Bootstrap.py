@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 """
 Multiple comparison bootstrap routines for simulation output analysis.
- 
+
 Implemented as a set of simple list comprehensions.
 
 @author: T.Monks
@@ -30,37 +30,16 @@ class BootstrapArguments:
         bootfunction:  the bootstrap function selected (dependent or independent)
         comparisonfunction: the comparison function selelcted (e.g. percentile CIs)
         nscenarios: number of scenarios
-        ncomparisons: number of comparisons (depending on pariwise or listwise)    
-    
+        ncomparisons: number of comparisons (depending on pariwise or listwise)   
     """
     def __init__(self):
         pass
 
 
 
-class reporter(object):
-    """
-    
-    Decorator for reporting the progress of a 
-    bootstrap process
-    
-    """
-    def __init__(self, func):
-        self.func = func
-		
-    def __call__(self, *args):
-        self.report(args[2])
-        return self.func(*args)
-	
-    def report(self, args):
-        args.lw_complete += 1.0
-        #args.worker.ReportProgress((args.lw_complete / args.ncomparisons) * 100.0)
-
 		
 DECIMAL_PLACES = 2
 
-
-#
 
 def resample_all_scenarios(scenarios, args):
     """
@@ -85,9 +64,7 @@ def resample_scenario(data, args):
     """
     return [args.boot_ts(data) for i in range(args.nboots)]
     
-    
-    
-    
+        
 
 def compare_scenarios_pairwise(scenarios, args):
     """
@@ -104,13 +81,9 @@ def compare_scenarios_pairwise(scenarios, args):
     args.lw_complete = 0
 	
     
-    
     return [compare_scenarios_listwise(scenarios[i], scenarios[i+1:], args)
                for i in range(len(scenarios) - 1)]
-               
-
-
-
+     
 
 def compare_scenarios_listwise(control, scenarios, args):
     """
@@ -127,40 +100,38 @@ def compare_scenarios_listwise(control, scenarios, args):
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
     @args.comp_function: the method of comparison e.g. percentile or probability x > y
     """
-    return [compare_two_scenarios3(control, scenarios[i], args) for i in range(len(scenarios))]
+    return [compare_two_scenarios(control, scenarios[i], args) for i in range(len(scenarios))]
     
    
 
 
 
+#@reporter
+#def compare_two_scenarios(first_scenario, second_scenario, args):
+#    """
+#    Compare two scenarios 
+
+#    @first_scenario - first scenario replication data;
+#    @second_scenario - second scenario replication data;
+#    """
+    
+#    diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
+#    return args.comp_function(diffs, args)
 
 
-@reporter
+#def compare_two_scenarios2(first_scenario, second_scenario, args):
+#    """
+#    Compare two scenarios using the list of comparison functions
+    
+#    @first_scenario - first scenario replication data;
+#    @second_scenario - second scenario replication data;
+#    @args.comp_functions - a list of comparison functions to use. 
+#    """
+    
+#   diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
+#   return [func(diffs, args) for func in args.comp_functions]
+
 def compare_two_scenarios(first_scenario, second_scenario, args):
-    """
-    Compare two scenarios 
-
-    @first_scenario - first scenario replication data;
-    @second_scenario - second scenario replication data;
-    """
-    
-    diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
-    return args.comp_function(diffs, args)
-
-
-def compare_two_scenarios2(first_scenario, second_scenario, args):
-    """
-    Compare two scenarios using the list of comparison functions
-    
-    @first_scenario - first scenario replication data;
-    @second_scenario - second scenario replication data;
-    @args.comp_functions - a list of comparison functions to use. 
-    """
-    
-    diffs = [args.boot_function(first_scenario, second_scenario) for i in range(args.nboots)] 
-    return [func(diffs, args) for func in args.comp_functions]
-
-def compare_two_scenarios3(first_scenario, second_scenario, args):
     """
     Compare two scenarios 
 
@@ -172,25 +143,7 @@ def compare_two_scenarios3(first_scenario, second_scenario, args):
     return args.comp_function(diffs, args)
 
 
-def boot_mean_diff3(data1, data2):
-    """
-    Computes the mean difference of bootstap samples
-    Assumes independence of samples
-    """
-    return [a - b for a, b in zip(data1, data2)]
 
-
-def proportion_x2_greaterthan_x1_2(data, args):
-    """
-    The number of bootstraps where the comparator was bigger than the control
-    Really not sure what to call this procedure!  
-    Rename to something more intuitive.
-    
-    @data: the bootstrapped mean differences
-    @args: bootstrap arguments (utility class)
-    
-    """
-    return round(sum(x < 0 for x in data)/args.nboots, DECIMAL_PLACES)
 
 
 
@@ -225,36 +178,21 @@ def proportion_x2_greaterthan_x1(data, args):
     return round(sum(x < 0 for x in data)/args.nboots, DECIMAL_PLACES)
 
 
-def plot_boostrap_samples_cdf(data, args):
-    # the histogram of the data
-    n, bins, patches = plt.hist(data, 50, cumulative = True, normed=1, linewidth=1.5, histtype='step', facecolor='green', alpha=0.75)
-    
-    plt.xlabel('Mean difference')
-    plt.ylabel('Cumulative Probability')
-    
-    plt.axis([min(data) - 1, max(data) + 1, 0, 1])
-    plt.grid(True)
-    
-    plt.show()
-    
-def plot_boostrap_samples_pdf(data, args):
-    # the histogram of the data
-    n, bins, patches = plt.hist(data, 50, normed=1, facecolor='green', alpha=0.75)
-    
-    plt.xlabel('Mean difference')
-    plt.ylabel('Cumulative Probability')
-    
-    plt.axis([min(data) - 1, max(data) + 1, 0, 1])
-    plt.grid(True)
-    
-    plt.show()
 
 def boot_mean_diff(data1, data2):
     """
     Computes the mean difference of bootstap samples
     Assumes independence of samples
     """
-    return bootstrap_mean(data1) - bootstrap_mean(data2)
+    return [a - b for a, b in zip(data1, data2)]
+
+
+#def boot_mean_diff(data1, data2):
+#    """
+#    Computes the mean difference of bootstap samples
+#    Assumes independence of samples
+#    """
+#    return bootstrap_mean(data1) - bootstrap_mean(data2)
 
 
 
@@ -319,8 +257,10 @@ def bootstrap_mean2(data, indexes):
     """
     Computes the mean of a bootstrap sample
     
-    20170727 TM Notes: Not completely sure why I wrote two bootstrap_mean functions?
-    This is the one that is used when assuming dependence.  bootstrap_mean used when assuming independence
+    20170727 TM Notes: Not completely sure why I wrote two 
+    bootstrap_mean functions?
+    This is the one that is used when assuming dependence.  
+    bootstrap_mean used when assuming independence
     
     Refactor to single function?
     

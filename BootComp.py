@@ -24,8 +24,12 @@ Possibly more performance on offer if data is already in a numpy array.
 
 import Bootstrap as bs
 import BootIO as io
+import BootChartExtensions as ch
 import MCC as mcc
 import ConvFuncs as cf
+
+
+
 
 CONFIDENCE = 95
 N_BOOTS = 1000
@@ -56,14 +60,16 @@ args.boot_function = bs.boot_mean_diff
     
 #args.comp_function = bs.percentile_confidence_interval
 args.comp_function = bs.proportion_x2_greaterthan_x1
-#args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
+#args.comp_function = ch.plot_boostrap_samples_cdf # use this to product charts instead
+#args.comp_function = ch.plot_boostrap_samples_pdf
+
 
 args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence_interval]
 
 #args.comp_function = bs.proportion_x2_greaterthan_x1
 #args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
 
-args.boot_function = bs.boot_mean_diff3
+args.boot_function = bs.boot_mean_diff
 args.boot_ts = bs.bootstrap_mean
 
 print("Resampling...")
@@ -78,13 +84,13 @@ results = bs.compare_scenarios_pairwise(r, args) # revised script
 #io.print_long_format_comparison_results(results)
 #io.write_long_format_comparison_results(results)
 
-#print(results)
+
 
 matrix = io.results_to_matrix(results) 
-#print(matrix)
+
 io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
-io.insert_inverse_results(matrix, N_SCENARIOS)
+#io.insert_inverse_results(matrix, N_SCENARIOS)
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 #io.write_results_matrix(matrix, N_SCENARIOS) 
