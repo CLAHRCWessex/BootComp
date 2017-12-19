@@ -59,10 +59,10 @@ def resample_scenario(data, args):
     
     @data - replications / batch means from a scenario
     @args - bootstrap arguments (utility class)
-    @args.boot_ts - test statistic to bootstrap e.g. mean
+    @args.point_estimate_func - point estimate summary statistic to bootstrap e.g. mean or Var
     
     """
-    return [args.boot_ts(data) for i in range(args.nboots)]
+    return [args.point_estimate_func(data) for i in range(args.nboots)]
     
         
 
@@ -74,7 +74,7 @@ def compare_scenarios_pairwise(scenarios, args):
     
     @args.nboots: number of bootstraps
     @args.confidence: alpha confidence level
-    @args.bootfunction:  the bootstrap function selected (dependent or independent)
+    @args.test_statistic_function: the test statistic to compare scenarios
     @args.nscenarios: number of scenarios
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
     """
@@ -95,7 +95,7 @@ def compare_scenarios_listwise(control, scenarios, args):
     
     @args.nboots: number of bootstraps
     @args.confidence: alpha confidence level
-    @args.bootfunction:  the bootstrap function selected (dependent or independent)
+    @args.test_statistic_function: the test statistic to compare scenarios
     @args.nscenarios: number of scenarios
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
     @args.comp_function: the method of comparison e.g. percentile or probability x > y
@@ -139,12 +139,8 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     @second_scenario - second scenario replication data;
     """
     
-    diffs = args.boot_function(first_scenario, second_scenario) 
+    diffs = args.test_statistic_function(first_scenario, second_scenario) 
     return args.comp_function(diffs, args)
-
-
-
-
 
 
 
@@ -243,13 +239,13 @@ def boot_dep_mean_diff(data1, data2):
 	
 
 	
-def boot_dep_x2_greater_than_x1(data1, data2):
-    """
-    Bootstraps dependent means and returns true/false
-    if x2 is > x1
-    """
-    indexes = resample(len(data1))
-    return bootstrap_mean2(data2, indexes) > bootstrap_mean2(data1, indexes)
+#def boot_dep_x2_greater_than_x1(data1, data2):
+#    """
+#    Bootstraps dependent means and returns true/false
+#    if x2 is > x1
+#    """
+#    indexes = resample(len(data1))
+#    return bootstrap_mean2(data2, indexes) > bootstrap_mean2(data1, indexes)
 	
 
 

@@ -46,17 +46,16 @@ args.nscenarios = N_SCENARIOS
 args.ncomparisons = mcc.pairwise_comparisons_count(N_SCENARIOS)
 args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
 
-#args.boot_function = bs.boot_dep_mean_diff   
-args.boot_function = bs.boot_mean_diff   
+
 
 #Basically we just write a new function for what ever type of comparison
 #we want to do.  Then assign it to args.comp_function
 #This could be modified to complete multiple actions i.e. percentile intervals and probabilities
 #Functions are:
-#Bootstrap.percentile_confidence_interval(data, args) 
-#Bootstrap.proportion_x2_greaterthan_x1(data, args) 
-#Bootstrap.plot_boostrap_samples_pdf(data, args)
-#Bootstrap.plot_boostrap_samples_cdf(data, args)
+#Bootstrap.percentile_confidence_interval(data, args)   = percentile confidence intervals
+#Bootstrap.proportion_x2_greaterthan_x1(data, args)     = P(Sj > Si)
+#Bootstrap.plot_boostrap_samples_pdf(data, args)        = Graphical comparison of difference PDF
+#Bootstrap.plot_boostrap_samples_cdf(data, args)        = Graphical comparison of difference CDF
     
 #args.comp_function = bs.percentile_confidence_interval
 args.comp_function = bs.proportion_x2_greaterthan_x1
@@ -64,21 +63,21 @@ args.comp_function = bs.proportion_x2_greaterthan_x1
 #args.comp_function = ch.plot_boostrap_samples_pdf
 
 
-args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence_interval]
+#args.comp_functions = [bs.proportion_x2_greaterthan_x1, bs.percentile_confidence_interval]  # to run multiple comparisons funcs in one go.
 
-#args.comp_function = bs.proportion_x2_greaterthan_x1
-#args.comp_function = bs.plot_boostrap_samples_cdf # use this to product charts instead
+#what test statisic to calculate - here we used the mean.
+args.point_estimate_func = bs.bootstrap_mean
 
-args.boot_function = bs.boot_mean_diff
-args.boot_ts = bs.bootstrap_mean
+#need to think about these names
+args.test_statistic_function = bs.boot_mean_diff
+
 
 print("Resampling...")
-r = bs.resample_all_scenarios(scenario_data, args)
+boot_data = bs.resample_all_scenarios(scenario_data, args)
 
 
 print("Running comparisons...")
-#results = bs.compare_scenarios_pairwise(scenario_data, args)
-results = bs.compare_scenarios_pairwise(r, args) # revised script
+results = bs.compare_scenarios_pairwise(boot_data, args) 
 
     
 #io.print_long_format_comparison_results(results)
