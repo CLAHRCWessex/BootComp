@@ -11,6 +11,12 @@ def list_of_lists(list_of_tuples):
     return [list(x) for x in list_of_tuples]
 
 
-def df_from_boot_list(list_of_lists, nboots):
-    return pd.DataFrame(list_of_lists, columns = [str(i) for i in range(1, nboots+1)])
+def resamples_to_df(list_of_lists, nboots):
+    """
+    Converts a list_of_lists into a dataframe.  
+    The list_of_lists represents a set of bootstrap resamples across
+    k systems
+    """
+    df = pd.DataFrame(list_of_lists, columns = [str(i) for i in range(1, nboots+1)])
+    return df.transpose()
    

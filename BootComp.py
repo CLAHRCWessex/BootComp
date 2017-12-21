@@ -78,13 +78,20 @@ boot_data = bs.resample_all_scenarios(scenario_data, args)
 print("Resampling complete.")
 
 
-print("Running comparisons...")
+print("Running comparisons...\n")
 results = bs.compare_scenarios_pairwise(boot_data, args) 
 
+df_boots = cf.resamples_to_df(boot_data, args.nboots)
 
-freqs = bs.rank_systems_min(boot_data, args)
-print(freqs)
-    
+ranks_1 = bs.rank_systems_min(df_boots, args)
+print(ranks_1)
+
+#mlargest = bs.rank_systems_mlargest(df_boots, args, 5)
+#print(mlargest)
+
+nsmallest = bs.rank_systems_msmallest(df_boots, args, 1)
+print(nsmallest)
+   
 #io.print_long_format_comparison_results(results)
 #io.write_long_format_comparison_results(results)
 
@@ -96,8 +103,9 @@ io.insert_inverse_results(matrix, N_SCENARIOS)
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
 io.write_results_matrix(matrix, N_SCENARIOS)
-print("Results written to file.")
+print("\nResults written to file.")
 
 
 print("Bootstrap analysis complete.")
+
 

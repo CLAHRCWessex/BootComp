@@ -275,17 +275,19 @@ def bootstrap_mean2(data, indexes):
     
 
 
-def rank_systems_min(boot_data, args):
+def rank_systems_min(df_boots, args):
     """
     Returns a dataframe containing ranked systems.  
     Dataframe contains the frequency and proportion of bootstrap
     resamples where a systems was 'best'.  In this case the minimum value.
+    special case of rank_systems_msmallest
     
-    @boot_data - the resampled data for each system
+    @df_boots - Pandas.DataFrame of bootstrap resamples. cols = systems
+                rows = resamples
     @args - BootstrapArguments object
     @args.nboots- the number of bootstrap resamples per system
     """
-    min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmin(axis=1)
+    min_systems = df_boots.idxmin(axis=1)
     ranks = min_systems.value_counts().to_frame()   
     ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
     ranks.columns = ['f_x', 'p_x']
@@ -293,19 +295,58 @@ def rank_systems_min(boot_data, args):
     return ranks
 
 
-def rank_systems_max(boot_data, args):
+def rank_systems_max(df_boots, args):
     """
     Returns a dataframe containing ranked systems.  
     Dataframe contains the frequency and proportion of bootstrap
     resamples where a systems was 'best'.  In this case the maximum value.
+    Special case of rank_systems_mlargest
     
-    @boot_data - the resampled data for each system
+    @df_boots - Pandas.DataFrame of bootstrap resamples. cols = systems
+                rows = resamples
     @args - BootstrapArguments object
     @args.nboots- the number of bootstrap resamples per system
     """
-    min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmax(axis=1)
+    min_systems = df_boots.idxmax(axis=1)
     ranks = min_systems.value_counts().to_frame()   
     ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
     ranks.columns = ['f_x', 'p_x']
     ranks.index.rename('system', inplace=True)
     return ranks    
+
+
+def rank_systems_mlargest(df_boots, args, m):
+    """
+    Returns a the systems that occur most frequently in 
+    the 'm' systems with the largest values for each resample.  
+    
+    @df_boots - Pandas.DataFrame of bootstrap resamples. cols = systems
+                rows = resamples
+    @args - arguments used in the resamples
+    @m- number of best systems to consider
+    """
+    systems = np.argsort(-df_boots.values, axis=1)[:, :m].flatten()
+    return rank_systems_m(systems, args)         
+
+
+def rank_systems_msmallest(df_boots, args, m):
+    """
+    Returns a the systems that occur most frequently in 
+    the 'm' systems with the smallest values for each resample.  
+    
+    @df_boots - Pandas.DataFrame of bootstrap resamples. cols = systems
+                rows = resamples
+    @args - arguments used in the resamples
+    @m- number of best systems to consider
+    """
+    systems = np.argsort(df_boots.values, axis=1)[:, :m].flatten()
+    return rank_systems_m(systems, args)
+
+def rank_systems_m(systems, args):
+    unique, counts = np.unique(systems, return_counts=True)
+    np_a = np.asarray((unique, counts)).T
+    df = pd.DataFrame(np_a, columns = ['system', 'f_x']) 
+    df['p_x'] = pd.Series(df['f_x']/args.nboots, index=df.index)  
+    df.set_index('system', inplace=True)
+    return df.sort_values(['f_x'], ascending=[False], kind='quicksort')  
+    
