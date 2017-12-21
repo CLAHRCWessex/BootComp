@@ -276,6 +276,15 @@ def bootstrap_mean2(data, indexes):
 
 
 def rank_systems_min(boot_data, args):
+    """
+    Returns a dataframe containing ranked systems.  
+    Dataframe contains the frequency and proportion of bootstrap
+    resamples where a systems was 'best'.  In this case the minimum value.
+    
+    @boot_data - the resampled data for each system
+    @args - BootstrapArguments object
+    @args.nboots- the number of bootstrap resamples per system
+    """
     min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmin(axis=1)
     ranks = min_systems.value_counts().to_frame()   
     ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
@@ -285,6 +294,15 @@ def rank_systems_min(boot_data, args):
 
 
 def rank_systems_max(boot_data, args):
+    """
+    Returns a dataframe containing ranked systems.  
+    Dataframe contains the frequency and proportion of bootstrap
+    resamples where a systems was 'best'.  In this case the maximum value.
+    
+    @boot_data - the resampled data for each system
+    @args - BootstrapArguments object
+    @args.nboots- the number of bootstrap resamples per system
+    """
     min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmax(axis=1)
     ranks = min_systems.value_counts().to_frame()   
     ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
