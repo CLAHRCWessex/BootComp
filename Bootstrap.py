@@ -12,9 +12,10 @@ Implemented as a set of simple list comprehensions.
 import numpy as np
 import matplotlib as mlab
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import BasicStatistics as bs
-
+import ConvFuncs as cf
 
 
 
@@ -174,6 +175,19 @@ def proportion_x2_greaterthan_x1(data, args):
     return round(sum(x < 0 for x in data)/args.nboots, DECIMAL_PLACES)
 
 
+def proportion_x2_lessthan_x1(data, args):
+    """
+    The number of bootstraps where the comparator was bigger than the control
+    Really not sure what to call this procedure!  
+    Rename to something more intuitive.
+    
+    @data: the bootstrapped mean differences
+    @args: bootstrap arguments (utility class)
+    
+    """
+    return round(sum(x > 0 for x in data)/args.nboots, DECIMAL_PLACES)
+
+
 
 def boot_mean_diff(data1, data2):
     """
@@ -239,13 +253,7 @@ def boot_dep_mean_diff(data1, data2):
 	
 
 	
-#def boot_dep_x2_greater_than_x1(data1, data2):
-#    """
-#    Bootstraps dependent means and returns true/false
-#    if x2 is > x1
-#    """
-#    indexes = resample(len(data1))
-#    return bootstrap_mean2(data2, indexes) > bootstrap_mean2(data1, indexes)
+
 	
 
 
@@ -266,3 +274,20 @@ def bootstrap_mean2(data, indexes):
     return bs.mean(boot(data, indexes))
     
 
+
+def rank_systems_min(boot_data, args):
+    min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmin(axis=1)
+    ranks = min_systems.value_counts().to_frame()   
+    ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
+    ranks.columns = ['f_x', 'p_x']
+    ranks.index.rename('system', inplace=True)
+    return ranks
+
+
+def rank_systems_max(boot_data, args):
+    min_systems = cf.df_from_boot_list(boot_data, args.nboots).transpose().idxmax(axis=1)
+    ranks = min_systems.value_counts().to_frame()   
+    ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
+    ranks.columns = ['f_x', 'p_x']
+    ranks.index.rename('system', inplace=True)
+    return ranks    

@@ -33,7 +33,7 @@ import ConvFuncs as cf
 
 CONFIDENCE = 95
 N_BOOTS = 1000
-INPUT_DATA = "data/mini_scenarios.csv"
+INPUT_DATA = "data/real_scenarios.csv"
 
 #note BootStrap routines require lists of lists
 scenario_data = cf.list_of_lists(io.load_scenarios(INPUT_DATA))
@@ -59,6 +59,7 @@ args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
     
 #args.comp_function = bs.percentile_confidence_interval
 args.comp_function = bs.proportion_x2_greaterthan_x1
+args.comp_function = bs.proportion_x2_lessthan_x1
 #args.comp_function = ch.plot_boostrap_samples_cdf # use this to product charts instead
 #args.comp_function = ch.plot_boostrap_samples_pdf
 
@@ -72,31 +73,30 @@ args.point_estimate_func = bs.bootstrap_mean
 args.test_statistic_function = bs.boot_mean_diff
 
 
-print("Resampling...")
+print("Resampling..please wait")
 boot_data = bs.resample_all_scenarios(scenario_data, args)
+print("Resampling complete.")
 
 
 print("Running comparisons...")
 results = bs.compare_scenarios_pairwise(boot_data, args) 
 
+
+freqs = bs.rank_systems_min(boot_data, args)
+print(freqs)
     
 #io.print_long_format_comparison_results(results)
 #io.write_long_format_comparison_results(results)
 
-
-
 matrix = io.results_to_matrix(results) 
 
-io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+io.insert_inverse_results(matrix, N_SCENARIOS)
 
-#io.insert_inverse_results(matrix, N_SCENARIOS)
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
-#io.write_results_matrix(matrix, N_SCENARIOS) 
-#print("Results written to file.")
-
-
-
+io.write_results_matrix(matrix, N_SCENARIOS)
+print("Results written to file.")
 
 
 print("Bootstrap analysis complete.")
