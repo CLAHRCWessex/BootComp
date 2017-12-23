@@ -180,10 +180,19 @@ def print_results_matrix(matrix, headers):
         print(row_format.format(scenario, *row ))
         
         
-def print_results_matrix2(matrix, headers):
+def matrix_to_dataframe(matrix, headers):
     """
-    Screen print of comparison results in matrix form.  Not nice
-    for large comparisons. 
+    Convert a matrix of multiple comparison results to a data frame
+    
+    @matrix - list of multiple comparisons in matrix form
+    @header - the header/row header sring
+    
+    example of matrix
+    
+    [['-', 0.19, 1.00]
+    [0.12, '-', 1.00]
+    [0.88, 0.45, '-']]
+    
     """
     
     df = pd.DataFrame(matrix, columns = headers)

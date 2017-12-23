@@ -101,7 +101,7 @@ results = bs.compare_scenarios_pairwise(subset, args)
 
 matrix = io.results_to_matrix(results) 
 io.insert_inverse_results(matrix, args.nscenarios)
-df = io.print_results_matrix2(matrix, [str(i) for i in subset_indexes])
+df = io.matrix_to_dataframe(matrix, [str(i) for i in subset_indexes])
 print(df)
 
 
