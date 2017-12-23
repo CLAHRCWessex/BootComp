@@ -6,6 +6,7 @@ Created on Sun Jul 30 11:51:07 2017
 """
 
 import csv
+import pandas as pd
 
 
 def load_scenarios(file_name):
@@ -62,34 +63,30 @@ def write_long_format_comparison_results(results):
                 comp += 1            
 
 
-def write_results_matrix(matrix, n_scenarios):
+#def write_results_matrix(matrix, n_scenarios):
     """
     Converts scenario comparison results to matrix format.
     Includes "-" for comparisons that are N/A
     """
      
-    headers = scenario_headers(n_scenarios)
-    row_headers = scenario_row_headers(n_scenarios)
-     
+#    headers = scenario_headers(n_scenarios)
+#    row_headers = scenario_row_headers(n_scenarios)
 
+#    output_list = []
     
-    print(matrix)
-    
-    output_list = []
-    
-    headers.insert(0, '')
-    output_list.append(headers) 
-    for scenario, row in zip(row_headers, matrix):
-        output_list.append([scenario, *row])
+#    headers.insert(0, '')
+#    output_list.append(headers) 
+#    for scenario, row in zip(row_headers, matrix):
+#        output_list.append([scenario, *row])
 
            
-    with open('results_matrix.csv', 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(output_list)
+#    with open('results_matrix.csv', 'w', newline='') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(output_list)
         
         
         
-def write_results_matrix2(matrix, headers):
+def write_results_matrix(matrix, headers):
     """
     Converts scenario comparison results to matrix format.
     Includes "-" for comparisons that are N/A
@@ -148,20 +145,7 @@ def insert_inverse_results(matrix, n_scenarios):
         
     
 
-def print_results_matrix(matrix, n_scenarios):
-    """
-    Screen print of comparison results in matrix form.  Not nice
-    for large comparisons. 
-    """
-    
-    headers = scenario_headers(n_scenarios)
-    row_headers = scenario_row_headers(n_scenarios)
-    
-                       
-    row_format ="{:>8}" * (len(headers)+1)
-    print(row_format.format("", *headers))
-    for scenario, row in zip(row_headers, matrix):
-        print(row_format.format(scenario, *row ))
+
         
        
 ## only works for full results.  doesn't work subsets
@@ -181,9 +165,8 @@ def scenario_row_headers(n_scenarios):
     return ["S{0}".format(i) for i in range(1, n_scenarios+1)]
 
 
-
     
-def print_results_matrix2(matrix, headers):
+def print_results_matrix(matrix, headers):
     """
     Screen print of comparison results in matrix form.  Not nice
     for large comparisons. 
@@ -195,4 +178,54 @@ def print_results_matrix2(matrix, headers):
     print(row_format.format("", *headers))
     for scenario, row in zip(row_headers, matrix):
         print(row_format.format(scenario, *row ))
+        
+        
+def print_results_matrix2(matrix, headers):
+    """
+    Screen print of comparison results in matrix form.  Not nice
+    for large comparisons. 
+    """
+    
+    df = pd.DataFrame(matrix, columns = headers)
+    df['systems'] = pd.Series(headers, index=df.index)  
+    df.set_index('systems', inplace=True)
+    del df.index.name
+    return df
+                       
+
+def colour_cells_by_proportion(val):
+    """
+    Takes a scalar and returns a string with
+    the css property `'color: red'` for negative
+    strings, black otherwise.
+    """
+    
+    colour = 'white'
+    if type(val) is float:
+        
+        
+        if val <= 0.05 :
+            colour = 'red' 
+        elif val <= 1 and val >= 0.95:
+            colour = 'green'
+        elif val < 0.95 and val > 0.05:
+            colour = 'yellow'
+    
+    return 'background-color: %s' % colour
+
+        
+#def print_results_matrix(matrix, n_scenarios):
+    """
+    Screen print of comparison results in matrix form.  Not nice
+    for large comparisons. 
+    """
+    
+#    headers = scenario_headers(n_scenarios)
+#    row_headers = scenario_row_headers(n_scenarios)
+    
+                       
+#    row_format ="{:>8}" * (len(headers)+1)
+#    print(row_format.format("", *headers))
+#    for scenario, row in zip(row_headers, matrix):
+#        print(row_format.format(scenario, *row ))
     

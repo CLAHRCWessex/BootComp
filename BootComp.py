@@ -90,7 +90,7 @@ msmallest = bs.rank_systems_msmallest(df_boots, args, 5)
 print(msmallest)
    
 
-subset_indexes = msmallest.index.values.tolist()
+subset_indexes = msmallest.index.values.tolist()[:10]
 subset = cf.subset_of_list(boot_data, subset_indexes)
 
 args.nscenarios = len(subset)
@@ -100,14 +100,16 @@ results = bs.compare_scenarios_pairwise(subset, args)
 #io.write_long_format_comparison_results(results)
 
 matrix = io.results_to_matrix(results) 
-
-#io.print_results_matrix2(matrix, [str(i) for i in subset_indexes])
-
 io.insert_inverse_results(matrix, args.nscenarios)
-#io.print_results_matrix2(matrix, [str(i) for i in subset_indexes]) 
-#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
+df = io.print_results_matrix2(matrix, [str(i) for i in subset_indexes])
+print(df)
 
-io.write_results_matrix2(matrix, [str(i) for i in subset_indexes])
+
+
+
+#io.print_results_matrix(matrix, [str(i) for i in subset_indexes]) 
+
+io.write_results_matrix(matrix, [str(i) for i in subset_indexes])
 
 #io.write_results_matrix(matrix, N_SCENARIOS)
 print("\nResults written to file.")
