@@ -10,8 +10,6 @@ Implemented as a set of simple list comprehensions.
 
 
 import numpy as np
-import matplotlib as mlab
-import matplotlib.pyplot as plt
 import pandas as pd
 
 import BasicStatistics as bs
@@ -349,4 +347,10 @@ def rank_systems_m(systems, args):
     df['p_x'] = pd.Series(df['f_x']/args.nboots, index=df.index)  
     df.set_index('system', inplace=True)
     return df.sort_values(['f_x'], ascending=[False], kind='quicksort')  
+
+
+
+    
+
+
     

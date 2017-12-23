@@ -71,6 +71,32 @@ def write_results_matrix(matrix, n_scenarios):
     headers = scenario_headers(n_scenarios)
     row_headers = scenario_row_headers(n_scenarios)
      
+
+    
+    print(matrix)
+    
+    output_list = []
+    
+    headers.insert(0, '')
+    output_list.append(headers) 
+    for scenario, row in zip(row_headers, matrix):
+        output_list.append([scenario, *row])
+
+           
+    with open('results_matrix.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(output_list)
+        
+        
+        
+def write_results_matrix2(matrix, headers):
+    """
+    Converts scenario comparison results to matrix format.
+    Includes "-" for comparisons that are N/A
+    """
+    
+    row_headers = headers[:]
+    
     output_list = []
     
     headers.insert(0, '')
@@ -130,6 +156,7 @@ def print_results_matrix(matrix, n_scenarios):
     
     headers = scenario_headers(n_scenarios)
     row_headers = scenario_row_headers(n_scenarios)
+    
                        
     row_format ="{:>8}" * (len(headers)+1)
     print(row_format.format("", *headers))
@@ -137,6 +164,7 @@ def print_results_matrix(matrix, n_scenarios):
         print(row_format.format(scenario, *row ))
         
        
+## only works for full results.  doesn't work subsets
             
 def scenario_headers(n_scenarios):
     """
@@ -155,5 +183,16 @@ def scenario_row_headers(n_scenarios):
 
 
     
-
+def print_results_matrix2(matrix, headers):
+    """
+    Screen print of comparison results in matrix form.  Not nice
+    for large comparisons. 
+    """
+    
+    row_headers = headers
+                       
+    row_format ="{:>8}" * (len(headers)+1)
+    print(row_format.format("", *headers))
+    for scenario, row in zip(row_headers, matrix):
+        print(row_format.format(scenario, *row ))
     

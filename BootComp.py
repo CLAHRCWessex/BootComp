@@ -24,14 +24,11 @@ Possibly more performance on offer if data is already in a numpy array.
 
 import Bootstrap as bs
 import BootIO as io
-import BootChartExtensions as ch
+#import BootChartExtensions as ch
 import MCC as mcc
 import ConvFuncs as cf
 
 
-
-
-CONFIDENCE = 95
 N_BOOTS = 1000
 INPUT_DATA = "data/real_scenarios.csv"
 
@@ -44,7 +41,7 @@ args =  bs.BootstrapArguments()
 args.nboots = N_BOOTS
 args.nscenarios = N_SCENARIOS
 args.ncomparisons = mcc.pairwise_comparisons_count(N_SCENARIOS)
-args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
+#args.confidence = mcc.bonferroni_adjusted_confidence(CONFIDENCE, N_SCENARIOS)
 
 
 
@@ -89,20 +86,30 @@ print(ranks_1)
 #mlargest = bs.rank_systems_mlargest(df_boots, args, 5)
 #print(mlargest)
 
-nsmallest = bs.rank_systems_msmallest(df_boots, args, 1)
-print(nsmallest)
+msmallest = bs.rank_systems_msmallest(df_boots, args, 5)
+print(msmallest)
    
+
+subset_indexes = msmallest.index.values.tolist()
+subset = cf.subset_of_list(boot_data, subset_indexes)
+
+args.nscenarios = len(subset)
+results = bs.compare_scenarios_pairwise(subset, args) 
+
 #io.print_long_format_comparison_results(results)
 #io.write_long_format_comparison_results(results)
 
 matrix = io.results_to_matrix(results) 
 
-#io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
-io.insert_inverse_results(matrix, N_SCENARIOS)
+#io.print_results_matrix2(matrix, [str(i) for i in subset_indexes])
 
+io.insert_inverse_results(matrix, args.nscenarios)
+#io.print_results_matrix2(matrix, [str(i) for i in subset_indexes]) 
 #io.print_results_matrix(matrix, N_SCENARIOS) #To DO. only works if proportion comparison performed!
 
-io.write_results_matrix(matrix, N_SCENARIOS)
+io.write_results_matrix2(matrix, [str(i) for i in subset_indexes])
+
+#io.write_results_matrix(matrix, N_SCENARIOS)
 print("\nResults written to file.")
 
 

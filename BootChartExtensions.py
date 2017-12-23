@@ -5,9 +5,7 @@ Created on Tue Dec 19 08:15:16 2017
 @author: tm3y13
 """
 
-import matplotlib as mlab
 import matplotlib.pyplot as plt
-
 import seaborn
 
 DECIMAL_PLACES = 2
