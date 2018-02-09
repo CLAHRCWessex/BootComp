@@ -68,6 +68,7 @@ print(ranks_1)
 #mlargest = bs.rank_systems_mlargest(df_boots, args, 5)
 #print(mlargest)
 
+print('Top m')
 msmallest = bs.rank_systems_msmallest(df_boots, args, 5)
 print(msmallest)
    
