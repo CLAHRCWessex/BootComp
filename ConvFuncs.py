@@ -18,6 +18,7 @@ def resamples_to_df(list_of_lists, nboots):
     k systems
     """
     df = pd.DataFrame(list_of_lists, columns = [str(i) for i in range(1, nboots+1)])
+    df.index += 1
     return df.transpose()
    
 

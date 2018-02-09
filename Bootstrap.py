@@ -97,7 +97,7 @@ def compare_scenarios_listwise(control, scenarios, args):
     @args.test_statistic_function: the test statistic to compare scenarios
     @args.nscenarios: number of scenarios
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
-    @args.comp_function: the method of comparison e.g. percentile or probability x > y
+    @args.summary_function: the method of comparison e.g. percentile or probability x > y
     """
     return [compare_two_scenarios(control, scenarios[i], args) for i in range(len(scenarios))]
     
@@ -139,7 +139,7 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     """
     
     diffs = args.test_statistic_function(first_scenario, second_scenario) 
-    return args.comp_function(diffs, args)
+    return args.summary_func(diffs, args)
 
 
 

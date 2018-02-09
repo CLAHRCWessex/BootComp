@@ -8,12 +8,15 @@ Created on Sun Jul 30 11:51:07 2017
 import csv
 import pandas as pd
 
+from ConvFuncs import list_of_lists
+
+
 
 def load_scenarios(file_name):
     """
     Reads scenario data from a .csv file (assumes comma delimited).  
     Assumes that each column represents a scenario.
-    Returns a list of tuples.  Each tuple are the replications from each
+    Returns a list of lists.  Each list is the replications from each
     scenario
 
     """
@@ -22,7 +25,7 @@ def load_scenarios(file_name):
 
         c_reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
         columns = list(zip(*c_reader))
-        return columns
+        return list_of_lists(columns)
 
 
 def print_long_format_comparison_results(results):
