@@ -43,7 +43,7 @@ def plot_boostrap_samples_pdf(data, args):
     plt.xlabel('Mean difference')
     plt.ylabel('Probability')
     
-    plt.axis([min(data) - 1, max(data) + 1, 0, 0.3])
+    plt.axis([min(data) - 1, max(data) + 1, 0, 2])
     plt.grid(True)
     
     plt.show()
