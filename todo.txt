@@ -1,0 +1,15 @@
+To do:
+
+1. Visual comparisons:
+a. Specifiy systems 1 and 2 and produce PDF and CDF
+b. Matrix of visual comparisons
+
+
+2. General clean-up of Ranking procedures - simplify
+
+3. Convert bootstrap code to use numpy arrays
+
+4. Bootstrap to handle dependency
+
+5. Multiple performance measures
+
