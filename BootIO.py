@@ -133,6 +133,11 @@ def results_to_matrix(results):
 
 
 def insert_inverse_results(matrix, n_scenarios):
+    """
+    By default a matrix of comparison results is only half
+    filled along the diagonal.  This function fills in the 
+    remaining diagnonal with the inverted results. 
+    """
       
     for col in range(len(matrix[0])):
         for row in range(col+1, len(matrix[0])):
@@ -140,14 +145,6 @@ def insert_inverse_results(matrix, n_scenarios):
                 matrix[row][col] = round(1 - matrix[col][row], 2)
                 
     
-                
-           
-    
-    
-    
-        
-    
-
 
         
        
@@ -183,26 +180,7 @@ def print_results_matrix(matrix, headers):
         print(row_format.format(scenario, *row ))
         
         
-def matrix_to_dataframe(matrix, headers):
-    """
-    Convert a matrix of multiple comparison results to a data frame
-    
-    @matrix - list of multiple comparisons in matrix form
-    @header - the header/row header sring
-    
-    example of matrix
-    
-    [['-', 0.19, 1.00]
-    [0.12, '-', 1.00]
-    [0.88, 0.45, '-']]
-    
-    """
-    
-    df = pd.DataFrame(matrix, columns = headers)
-    df['systems'] = pd.Series(headers, index=df.index)  
-    df.set_index('systems', inplace=True)
-    del df.index.name
-    return df
+
                        
 
 def colour_cells_by_proportion(val):
@@ -212,32 +190,21 @@ def colour_cells_by_proportion(val):
     strings, black otherwise.
     """
     
+    lower=0.05
+    upper=0.95
     colour = 'white'
     if type(val) is float:
         
         
-        if val <= 0.05 :
+        if val <= lower :
             colour = 'red' 
-        elif val <= 1 and val >= 0.95:
+        elif val <= 1 and val >= upper:
             colour = 'green'
-        elif val < 0.95 and val > 0.05:
+        elif val < upper and val > lower:
             colour = 'yellow'
     
     return 'background-color: %s' % colour
 
         
-#def print_results_matrix(matrix, n_scenarios):
-    """
-    Screen print of comparison results in matrix form.  Not nice
-    for large comparisons. 
-    """
-    
-#    headers = scenario_headers(n_scenarios)
-#    row_headers = scenario_row_headers(n_scenarios)
-    
-                       
-#    row_format ="{:>8}" * (len(headers)+1)
-#    print(row_format.format("", *headers))
-#    for scenario, row in zip(row_headers, matrix):
-#        print(row_format.format(scenario, *row ))
+
     

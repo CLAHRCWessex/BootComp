@@ -20,6 +20,28 @@ def resamples_to_df(list_of_lists, nboots):
     df = pd.DataFrame(list_of_lists, columns = [str(i) for i in range(1, nboots+1)])
     df.index += 1
     return df.transpose()
+
+
+def matrix_to_dataframe(matrix, headers):
+    """
+    Convert a matrix of multiple comparison results to a data frame
+    
+    @matrix - list of multiple comparisons in matrix form
+    @header - the header/row header sring
+    
+    example of matrix
+    
+    [['-', 0.19, 1.00]
+    [0.12, '-', 1.00]
+    [0.88, 0.45, '-']]
+    
+    """
+    
+    df = pd.DataFrame(matrix, columns = headers)
+    df['systems'] = pd.Series(headers, index=df.index)  
+    df.set_index('systems', inplace=True)
+    del df.index.name
+    return df
    
 
 def subset_of_list(data, indexes):

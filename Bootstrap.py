@@ -94,10 +94,10 @@ def compare_scenarios_listwise(control, scenarios, args):
     
     @args.nboots: number of bootstraps
     @args.confidence: alpha confidence level
-    @args.test_statistic_function: the test statistic to compare scenarios
+    @args.difference_func: the function used for comparing the difference between scenarios.
     @args.nscenarios: number of scenarios
     @args.ncomparisons: number of comparisons (depending on pariwise or listwise)
-    @args.summary_function: the method of comparison e.g. percentile or probability x > y
+    @args.summary_function: the method to summarise the comparison e.g. percentile or probability x > y
     """
     return [compare_two_scenarios(control, scenarios[i], args) for i in range(len(scenarios))]
     
@@ -138,7 +138,7 @@ def compare_two_scenarios(first_scenario, second_scenario, args):
     @second_scenario - second scenario replication data;
     """
     
-    diffs = args.test_statistic_function(first_scenario, second_scenario) 
+    diffs = args.difference_func(first_scenario, second_scenario) 
     return args.summary_func(diffs, args)
 
 

@@ -45,11 +45,11 @@ args.summary_func = bs.proportion_x2_greaterthan_x1
 #args.summary_func = bs.proportion_x2_lessthan_x1
 
 
-#what test statisic to calculate - here we used the mean.
+#what test statisic to calculate on each bootstrap- here we used the mean.
 args.point_estimate_func = bs.bootstrap_mean
 
 #need to think about these names
-args.test_statistic_function = bs.boot_mean_diff
+args.difference_func = bs.boot_mean_diff
 
 
 print("Resampling..please wait")
@@ -83,7 +83,7 @@ results = bs.compare_scenarios_pairwise(subset, args)
 
 matrix = io.results_to_matrix(results) 
 io.insert_inverse_results(matrix, args.nscenarios)
-df = io.matrix_to_dataframe(matrix, [str(i) for i in subset_indexes])
+df = cf.matrix_to_dataframe(matrix, [str(i) for i in subset_indexes])
 print(df)
 
 
