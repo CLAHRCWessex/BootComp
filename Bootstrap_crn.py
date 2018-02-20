@@ -20,7 +20,7 @@ def load_scenarios(file_name, delim=','):
 
     """
     
-    return np.genfromtxt(file_name, delimiter=delim).T
+    return np.genfromtxt(file_name, delimiter=delim)
     
 
 def resample_all_scenarios(data, boots=1000):
@@ -33,7 +33,7 @@ def resample_all_scenarios(data, boots=1000):
     """
     
     resampled = np.empty([boots, data.shape[1]])
-    
+        
     for i in range(boots):
         resampled[i] = block_bootstrap(data).mean(axis=0)
         
