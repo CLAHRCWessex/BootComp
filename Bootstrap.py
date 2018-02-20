@@ -343,6 +343,7 @@ def rank_systems_msmallest(df_boots, args, m):
 def rank_systems_m(systems, args):
     #returning indexes that are 1 too low.
     unique, counts = np.unique(systems, return_counts=True)
+    #unique+1 adds 1 to indexes to line up with dataframes.
     np_a = np.asarray((unique+1, counts)).T
     df = pd.DataFrame(np_a, columns = ['system', 'f_x']) 
     df['p_x'] = pd.Series(df['f_x']/args.nboots, index=df.index)  
