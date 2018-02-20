@@ -55,6 +55,51 @@ def block_bootstrap(data):
     return resampled
         
 
+def variance_reduction_results(data):
+    """
+    Check if common random numbers have
+    been successful in reducing the variance
+    
+    if successful the variance of the differences between
+    two scenarios will be less than the sum.
+    
+    returns: numpy array of length len(data) - 1.  Each value 
+    is either 0 (variance not reduced) or 1 (variance reduced)
+    
+    @data - the scenario data.
+    
+    """
+    sums = sum_of_variances(data)
+    diffs = variance_of_differences(data)
+    
+    less_than = lambda t: 1 if t <=0 else 1
+    vfunc = np.vectorize(less_than)
+    return vfunc(np.subtract(diffs, sums))
+    
+    
+    
+
+def sum_of_variances(data):
+    var = data.var(axis=0)
+
+    sums = np.empty([var.shape[0] -1, ])
+    
+    for i in range(len(var) - 1):
+        sums[i] = var[i] + var[i+1]
+        
+    return sums
+
+
+    
+        
+
+def variance_of_differences(data):
+    """
+    return the variance of the differences
+    """
+    return np.diff(data).var(axis=0)
+    
+    
 
 
 
