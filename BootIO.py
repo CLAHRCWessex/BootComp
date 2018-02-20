@@ -9,6 +9,7 @@ import csv
 import pandas as pd
 
 from ConvFuncs import list_of_lists
+from numpy import float64
 
 
 
@@ -193,15 +194,17 @@ def colour_cells_by_proportion(val):
     lower=0.05
     upper=0.95
     colour = 'white'
-    if type(val) is float:
+    
+    if type(val) is float or type(val) is float64:
         
-        
+    
         if val <= lower :
             colour = 'red' 
         elif val <= 1 and val >= upper:
             colour = 'green'
         elif val < upper and val > lower:
             colour = 'yellow'
+
     
     return 'background-color: %s' % colour
 

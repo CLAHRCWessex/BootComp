@@ -54,6 +54,15 @@ def block_bootstrap(data):
             
     return resampled
         
+
+
+
+
+
+
+
+
+
         
 
 
