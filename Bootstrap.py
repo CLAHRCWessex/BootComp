@@ -285,12 +285,13 @@ def rank_systems_min(df_boots, args):
     @args - BootstrapArguments object
     @args.nboots- the number of bootstrap resamples per system
     """
-    min_systems = df_boots.idxmin(axis=1)
-    ranks = min_systems.value_counts().to_frame()   
-    ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
-    ranks.columns = ['f_x', 'p_x']
-    ranks.index.rename('system', inplace=True)
-    return ranks
+    #min_systems = df_boots.idxmin(axis=1)
+    #ranks = min_systems.value_counts().to_frame()   
+    #ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
+    #ranks.columns = ['f_x', 'p_x']
+    #ranks.index.rename('system', inplace=True)
+    #return ranks
+    return rank_systems_msmallest(df_boots, args, 1)
 
 
 def rank_systems_max(df_boots, args):
@@ -305,12 +306,13 @@ def rank_systems_max(df_boots, args):
     @args - BootstrapArguments object
     @args.nboots- the number of bootstrap resamples per system
     """
-    min_systems = df_boots.idxmax(axis=1)
-    ranks = min_systems.value_counts().to_frame()   
-    ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
-    ranks.columns = ['f_x', 'p_x']
-    ranks.index.rename('system', inplace=True)
-    return ranks    
+    #min_systems = df_boots.idxmax(axis=1)
+    #ranks = min_systems.value_counts().to_frame()   
+    #ranks['p_x'] = pd.Series(ranks[0]/args.nboots, index=ranks.index)
+    #ranks.columns = ['f_x', 'p_x']
+    #ranks.index.rename('system', inplace=True)
+    #return ranks    
+    return rank_systems_mlargest(df_boots, args, 1)
 
 
 def rank_systems_mlargest(df_boots, args, m):
@@ -323,8 +325,16 @@ def rank_systems_mlargest(df_boots, args, m):
     @args - arguments used in the resamples
     @m- number of best systems to consider
     """
-    systems = np.argsort(-df_boots.values, axis=1)[:, :m].flatten()
-    return rank_systems_m(systems, args)         
+    
+    arr_boots =-df_boots.values
+    systems = []
+        
+    for y in arr_boots:
+        idx = np.argpartition(y, m)
+        systems.append(np.where(y <= y[idx[m-1]]))
+
+    return rank_systems_m(np.concatenate(systems, axis=1), args)
+           
 
 
 def rank_systems_msmallest(df_boots, args, m):
@@ -337,13 +347,25 @@ def rank_systems_msmallest(df_boots, args, m):
     @args - arguments used in the resamples
     @m- number of best systems to consider
     """
-    systems = np.argsort(df_boots.values, axis=1)[:, :m].flatten()
-    return rank_systems_m(systems, args)
+    
+    arr_boots =df_boots.values
+    systems = []
+        
+    for y in arr_boots:
+        idx = np.argpartition(y, m)
+        systems.append(np.where(y <= y[idx[m-1]]))
+
+    return rank_systems_m(np.concatenate(systems, axis=1), args)
+   
+
+def rank_systems_msmallest_row(arr_boots, m):
+    pass
+
 
 def rank_systems_m(systems, args):
     #returning indexes that are 1 too low.
     unique, counts = np.unique(systems, return_counts=True)
-    #unique+1 adds 1 to indexes to line up with dataframes.
+    #unique+1 adds 1 to indexes to line up with dbataframes.
     np_a = np.asarray((unique+1, counts)).T
     df = pd.DataFrame(np_a, columns = ['system', 'f_x']) 
     df['p_x'] = pd.Series(df['f_x']/args.nboots, index=df.index)  
