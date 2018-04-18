@@ -8,7 +8,7 @@ taking account of dependency across scenarios.
 import numpy as np
 
 
-def load_scenarios(file_name, delim=','):
+def load_scenarios(file_name, exclude_reps = 0, delim=','):
     """
     Reads scenario data from a .csv file (assumes comma delimited).  
     Assumes that each column represents a scenario.
@@ -20,7 +20,7 @@ def load_scenarios(file_name, delim=','):
 
     """
     
-    return np.genfromtxt(file_name, delimiter=delim)
+    return np.genfromtxt(file_name, delimiter=delim, skip_footer = exclude_reps)
     
 
 def resample_all_scenarios(data, boots=1000):
