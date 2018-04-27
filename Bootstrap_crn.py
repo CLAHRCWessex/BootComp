@@ -53,6 +53,47 @@ def block_bootstrap(data):
         resampled[i] = data[np.random.choice(data.shape[0])]
             
     return resampled
+
+
+def test():
+    INPUT_DATA1 = "data/replications_wait_times.csv"
+    system_data_wait = load_scenarios(INPUT_DATA1, 45)
+    #N_SCENARIOS = system_data_wait.shape[1]
+    #N_REPS = system_data_wait.shape[0]
+    
+    return system_data_wait
+
+
+def bootstrap_np(data, boots=1000):
+    
+    to_return = np.empty([boots, data.shape[0]])
+    
+    sys_index =0
+    total=0
+        
+    for system in data:
+        
+        for b in range(boots):
+
+            #resampled = np.empty([system.shape[0]])
+        
+            for i in range(system.shape[0]):
+                
+                #resampled[i] = system[np.random.choice(system.shape[0])]
+                total += system[round(np.random.uniform(0, system.shape[0])-1)]
+                #resampled[i] = system[round(np.random.uniform(0, 4))]
+                
+            #to_return[b, sys_index] = resampled.mean()
+            #to_return[b, sys_index] = resampled.sum() / resampled.shape[0]
+            to_return[b, sys_index] = total / system.shape[0]
+            total= 0
+        sys_index += 1
+            
+    return to_return
+            
+            
+    
+    
         
 
 def variance_reduction_results(data):
