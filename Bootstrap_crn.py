@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-An alternative implementation of the bootstrap multiple comparison routine
+Extra procedures for bootstrap multiple comparison routine
 taking account of dependency across scenarios.
+Used within SW18 and WCS18 conference papers.
 
 """
 
 import numpy as np
+import pandas as pd
 
+import ConvFuncs as cf
+import Bootstrap as bs
 
-def load_scenarios(file_name, exclude_reps = 0, delim=','):
+def load_systems(file_name, exclude_reps = 0, delim=','):
     """
     Reads scenario data from a .csv file (assumes comma delimited).  
     Assumes that each column represents a scenario.
@@ -65,7 +69,17 @@ def test():
 
 
 def bootstrap_np(data, boots=1000):
+    """
+    Alternative bootstrap routine that works exclusively with a numpy 
+    array.  Seems to offer limited performance improvement!?
+    What am I doing in the standard Python code that makes it so efficient?
+    Expense operations here are: round, random.uniform - but only to a limited
+    extent!
     
+    REturns a numpy array containing the bootstrap resamples
+    @data = numpy array of systems to boostrap
+    @boots = number of bootstrap (default = 1000)
+    """
     to_return = np.empty([boots, data.shape[0]])
     
     sys_index =0
@@ -74,17 +88,11 @@ def bootstrap_np(data, boots=1000):
     for system in data:
         
         for b in range(boots):
-
-            #resampled = np.empty([system.shape[0]])
         
             for i in range(system.shape[0]):
                 
-                #resampled[i] = system[np.random.choice(system.shape[0])]
                 total += system[round(np.random.uniform(0, system.shape[0])-1)]
-                #resampled[i] = system[round(np.random.uniform(0, 4))]
-                
-            #to_return[b, sys_index] = resampled.mean()
-            #to_return[b, sys_index] = resampled.sum() / resampled.shape[0]
+
             to_return[b, sys_index] = total / system.shape[0]
             total= 0
         sys_index += 1
@@ -142,7 +150,49 @@ def variance_of_differences(data):
     
     
 
-
+def bootstrap_chance_constraint(data, threshold, boot_args, gamma=0.95, kind='lower'):
+    """
+    Bootstrap a chance constraint for k systems and filter out systems 
+    where p% of resamples are greater a threshold t.  
+    
+    Example 1. A lower limit.  If the chance constaint was related to utilization it could be stated as 
+    filter out any systems where 95% of the distribution is greater than 80%.
+    
+    Example 2. An upper limit.  If the chance constraint related to unwanted ward transfers it could be stated 
+    as filter out any systems where 95% of the distribution is less than 50 transfers per annum.
+    
+    Returns a pandas.Series containing of the feasible systems i.e. that do not violate the chance constraint.
+    
+    @data - a numpy array of the data to bootstrap
+    @threshold - the threshold of the chance constraint
+    @boot_args - the bootstrap setup class
+    @p - the probability cut of for the chance constraint  (default p = 0.95)
+    @kind - 'lower' = a lower limit threshold; 'upper' = an upper limit threshold (default = 'lower')
+    
+    """
+    
+    valid_operations = ['upper', 'lower']
+    
+    if kind.lower() not in valid_operations:
+        raise ValueError('Parameter @kind must be either set to lower or upper')
+    
+    resample_list = bs.resample_all_scenarios(data.tolist(), boot_args)
+    df_boots = cf.resamples_to_df(resample_list, boot_args.nboots)
+    
+    if('lower' == kind.lower()):
+        
+        df_counts = pd.DataFrame(df_boots[df_boots >= threshold].count(), columns = {'count'})
+    else:
+        df_counts = pd.DataFrame(df_boots[df_boots <= threshold].count(), columns = {'count'})
+        
+    df_counts['prop'] = df_counts['count'] / boot_args.nboots
+    df_counts['pass'] = np.where(df_counts['prop'] >= gamma, 1, 0)
+    df_counts.index -= 1
+    
+    return df_counts.loc[df_counts['pass'] == 1].index
+    
+    
+    
 
 
 
