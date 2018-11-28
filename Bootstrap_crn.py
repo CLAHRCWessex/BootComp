@@ -8,6 +8,7 @@ Used within SW18 and WCS18 conference papers.
 
 import numpy as np
 import pandas as pd
+from numba import jit, prange
 
 import ConvFuncs as cf
 import Bootstrap as bs
@@ -59,13 +60,6 @@ def block_bootstrap(data):
     return resampled
 
 
-def test():
-    INPUT_DATA1 = "data/replications_wait_times.csv"
-    system_data_wait = load_scenarios(INPUT_DATA1, 45)
-    #N_SCENARIOS = system_data_wait.shape[1]
-    #N_REPS = system_data_wait.shape[0]
-    
-    return system_data_wait
 
 
 def bootstrap_np(data, boots=1000):
@@ -150,7 +144,7 @@ def variance_of_differences(data):
     
     
 
-def bootstrap_chance_constraint(data, threshold, boot_args, gamma=0.95, kind='lower'):
+def bootstrap_chance_constraint_plain_vanilla(data, threshold, boot_args, gamma=0.95, kind='lower'):
     """
     Bootstrap a chance constraint for k systems and filter out systems 
     where p% of resamples are greater a threshold t.  
@@ -190,6 +184,124 @@ def bootstrap_chance_constraint(data, threshold, boot_args, gamma=0.95, kind='lo
     df_counts.index -= 1
     
     return df_counts.loc[df_counts['pass'] == 1].index
+ 
+   
+   
+   
+def bootstrap_chance_constraint(data, threshold, nboots=1000, gamma=0.95, kind='lower'):
+    """
+    Bootstrap a chance constraint for k systems and filter out systems 
+    where p% of resamples are greater a threshold t.  
+    
+    Example 1. A lower limit.  If the chance constaint was related to utilization it could be stated as 
+    filter out any systems where 95% of the distribution is greater than 80%.
+    
+    Example 2. An upper limit.  If the chance constraint related to unwanted ward transfers it could be stated 
+    as filter out any systems where 95% of the distribution is less than 50 transfers per annum.
+    
+    Returns a pandas.Series containing of the feasible systems i.e. that do not violate the chance constraint.
+    
+    Keyword arguments
+    data -- a numpy array of the data to bootstrap
+    threshold -- the threshold of the chance constraint
+    boot_args -- the bootstrap setup class
+    gamma -- the probability cut of for the chance constraint  (default p = 0.95)
+    kind -- 'lower' = a lower limit threshold; 'upper' = an upper limit threshold (default = 'lower')
+    
+    """
+    
+    valid_operations = ['upper', 'lower']
+    
+    if kind.lower() not in valid_operations:
+        raise ValueError('Parameter @kind must be either set to lower or upper')
+    
+    df_boots = pd.DataFrame(multi_bootstrap_par(data, nboots).T)
+    
+    if('lower' == kind.lower()):
+       
+        df_counts = pd.DataFrame(df_boots[df_boots >= threshold].count(), columns = {'count'})
+    else:
+        df_counts = pd.DataFrame(df_boots[df_boots <= threshold].count(), columns = {'count'})
+      
+    df_counts['prop'] = df_counts['count'] / nboots
+    df_counts['pass'] = np.where(df_counts['prop'] >= gamma, 1, 0)
+    
+    return df_counts.loc[df_counts['pass'] == 1].index
+
+
+@jit(nopython=False)
+def multi_bootstrap_par(data, boots):
+    """
+    Keyword arguments:
+    data -- numpy multi-dimentional array 
+    boot -- number of bootstraps  
+    
+    """
+    designs = data.shape[0]
+    
+    to_return = np.empty((designs, boots))
+    
+    for design in range(designs):
+        
+        to_return[design:design+1] = bootstrap(data[design], boots)
+        
+    return to_return
+
+
+@jit(nopython=True, parallel=True)
+def bootstrap_par(data, boots):
+    """
+    Create bootstrap datasets that represent the distribution of the mean.
+    Returns a numpy array containing the bootstrap datasets 
+    
+    Keyword arguments:
+    data -- numpy array of systems to boostrap
+    boots -- number of bootstrap (default = 1000)
+    """
+    
+    bs_data = np.empty(boots)
+    
+    for b in prange(boots):
+        
+        total=0
+        
+        for s in range(data.shape[0]):
+        
+            total += data[round(np.random.uniform(0, data.shape[0]-1))]
+
+        bs_data[b] = total / data.shape[0]
+
+    return bs_data
+
+
+@jit(nopython=True)
+def bootstrap(data, boots):
+    """
+    Create bootstrap datasets that represent the distribution of the mean.
+    Returns a numpy array containing the bootstrap datasets 
+    
+    Keyword arguments:
+    data -- numpy array of systems to boostrap
+    boots -- number of bootstrap (default = 1000)
+    """
+    
+    bs_data = np.empty(boots)
+    
+    for b in range(boots):
+        
+        total=0
+        
+        for s in range(data.shape[0]):
+        
+            total += data[round(np.random.uniform(0, data.shape[0]-1))]
+
+        bs_data[b] = total / data.shape[0]
+
+    return bs_data
+
+
+
+
     
     
     
