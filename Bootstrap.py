@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 import BasicStatistics as bs
-import ConvFuncs as cf
+
 
 
 
@@ -232,8 +232,9 @@ def resample(n):
     @n : number of random integers to generate
     
     """
-    x = [round(np.random.uniform(0, n-1)) for i in range(n)]
-        
+    #x = [round(np.random.uniform(0, n-1)) for i in range(n)]
+    x = [np.random.randint(0, n) for i in range(n)]
+            
     return x
 		
 	
