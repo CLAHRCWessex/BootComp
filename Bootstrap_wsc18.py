@@ -144,7 +144,7 @@ def variance_of_differences(data):
     
     
 
-def bootstrap_chance_constraint_plain_vanilla(data, threshold, boot_args, gamma=0.95, kind='lower'):
+def constraints_bootstrap_plain_vanilla(data, threshold, boot_args, gamma=0.95, kind='lower'):
     """
     Bootstrap a chance constraint for k systems and filter out systems 
     where p% of resamples are greater a threshold t.  
@@ -301,8 +301,6 @@ def bootstrap(data, boots):
 
 
 
-
-    
 def indifferent(x, indifference):
     """
     convert numbers to 0 or 1
@@ -314,7 +312,7 @@ def indifferent(x, indifference):
     else:
         return 0
 
-def quality_bootstrap(feasible_systems, subset, best_system_index, x=0.1, y = 0.95, nboots = 1000):
+def quality_bootstrap(feasible_systems, headers, best_system_index, x=0.1, y = 0.95, nboots = 1000):
     """
     1. Create differences of systems from best system
     2. Create nboots bootstrap datasets of the differences
@@ -322,7 +320,7 @@ def quality_bootstrap(feasible_systems, subset, best_system_index, x=0.1, y = 0.
     
     Keyword arguments:
     feasible_systems -- systems that meet chance constraints (if there are any)
-    subset -- list of system indexes that are feasible
+    headers -- list of system indexes that are feasible
     best_system_index -- index of the best system within @feasible_systems
     args - Instance of a BootstrapArguments class
     x -- % tolerance of difference from best mean allowed (default = 0.1)
@@ -333,14 +331,13 @@ def quality_bootstrap(feasible_systems, subset, best_system_index, x=0.1, y = 0.
     
     #setup differences
     diffs =  pd.DataFrame(feasible_systems.values.T - np.array(feasible_systems[best_system_index])).T
-    diffs.columns = subset
+    diffs.columns = headers
     
     #create bootstrap datasets
     #resample_diffs = bs.resample_all_scenarios(diffs.values.T.tolist(), args)
     #df = cf.resamples_to_df(resample_diffs, nboots)
     df = pd.DataFrame(multi_bootstrap_par(diffs.values.T, nboots).T)
-    
-    df.columns = subset    
+    df.columns = headers    
     
     #find systems that have y% of bootstrap samples within x% of the best mean
     return within_x(df, x, y, feasible_systems, best_system_index, nboots)
@@ -359,35 +356,6 @@ def within_x(diffs, x, y, systems, best_system_index, nboots):
     return df_within_limit.loc[df_within_limit['sum'] >= threshold].index
     
 
-def simulate_stage_2(take_forward, model_file):
-   df_wait_s2 = pd.DataFrame(load_systems(model_file[0]))[take_forward]
-   df_util_s2 = pd.DataFrame(load_systems(model_file[1]))[take_forward]
-   df_tran_s2 = pd.DataFrame(load_systems(model_file[2]))[take_forward]
-      
-   print("Loaded waiting time data. {0} systems; {1} replications".format(df_wait_s2.shape[1], df_wait_s2.shape[0]))
-   print("Loaded utilzation data. {0} systems; {1} replications".format(df_util_s2.shape[1], df_util_s2.shape[0]))
-   print("Loaded transfers data. {0} systems; {1} replications".format(df_tran_s2.shape[1], df_tran_s2.shape[0]))
-   
-   return df_wait_s2,df_util_s2, df_tran_s2
-
-
-def simulate_stage_1(n_1, model):
-   system_data_wait = load_systems(model[0], exclude_reps = 50-n_1)
-   system_data_util = load_systems(model[1], exclude_reps = 50-n_1)
-   system_data_tran = load_systems(model[2], exclude_reps = 50-n_1)
-   
-   #N_SCENARIOS = system_data_wait.shape[1]
-   #N_REPS = system_data_wait.shape[0]
-   
-   print("Loaded waiting time data. {0} systems; {1} replications".format(system_data_wait.shape[1], system_data_wait.shape[0]))
-   print("Loaded utilzation data. {0} systems; {1} replications".format(system_data_util.shape[1], system_data_util.shape[0]))
-   print("Loaded transfers data. {0} systems; {1} replications".format(system_data_tran.shape[1], system_data_tran.shape[0]))
-   
-   df_tran = pd.DataFrame(system_data_tran)
-   df_util = pd.DataFrame(system_data_util)
-   df_wait = pd.DataFrame(system_data_wait)
-   
-   return df_wait, df_util, df_tran
 
         
 
