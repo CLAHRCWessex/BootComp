@@ -188,7 +188,7 @@ def constraints_bootstrap_plain_vanilla(data, threshold, boot_args, gamma=0.95, 
    
    
    
-def constraints_bootstrap(data, threshold, nboots=1000, gamma=0.95, kind='lower'):
+def constraints_bootstrap(data, threshold, nboots=1000, gamma=0.95, kind='lower', cores='single'):
     """
     Bootstrap a chance constraint for k systems and filter out systems 
     where p% of resamples are greater a threshold t.  
@@ -207,18 +207,26 @@ def constraints_bootstrap(data, threshold, nboots=1000, gamma=0.95, kind='lower'
     boot_args -- the bootstrap setup class
     gamma -- the probability cut of for the chance constraint  (default p = 0.95)
     kind -- 'lower' = a lower limit threshold; 'upper' = an upper limit threshold (default = 'lower')
+    cores - single ('single' or 's') core or parallel ('p' or 'parallel') execution. (default = 's')
     
     """
     
     valid_operations = ['upper', 'lower']
+    valid_cores =['single', 'parallel', 's', 'p']
     
     if kind.lower() not in valid_operations:
         raise ValueError('Parameter @kind must be either set to lower or upper')
+
+    if cores.lower() not in valid_cores:
+        raise ValueError('Parameter @cores must be either set to single (default) or parrallel (or p)')
     
-    df_boots = pd.DataFrame(multi_bootstrap_par(data, nboots).T)
+
+    if('single' == cores or 's' == cores):
+        df_boots = pd.DataFrame(multi_bootstrap(data, nboots).T)
+    else:
+        df_boots = pd.DataFrame(multi_bootstrap_par(data, nboots).T)
     
     if('lower' == kind.lower()):
-       
         df_counts = pd.DataFrame(df_boots[df_boots >= threshold].count(), columns = {'count'})
     else:
         df_counts = pd.DataFrame(df_boots[df_boots <= threshold].count(), columns = {'count'})
@@ -227,6 +235,25 @@ def constraints_bootstrap(data, threshold, nboots=1000, gamma=0.95, kind='lower'
     df_counts['pass'] = np.where(df_counts['prop'] >= gamma, 1, 0)
     
     return df_counts.loc[df_counts['pass'] == 1].index
+
+
+@jit(nopython=False)
+def multi_bootstrap(data, boots):
+    """
+    Keyword arguments:
+    data -- numpy multi-dimentional array 
+    boot -- number of bootstraps  
+    
+    """
+    designs = data.shape[0]
+    
+    to_return = np.empty((designs, boots))
+    
+    for design in range(designs):
+        
+        to_return[design:design+1] = bootstrap(data[design], boots)
+        
+    return to_return
 
 
 @jit(nopython=False)
@@ -243,7 +270,7 @@ def multi_bootstrap_par(data, boots):
     
     for design in range(designs):
         
-        to_return[design:design+1] = bootstrap(data[design], boots)
+        to_return[design:design+1] = bootstrap_par(data[design], boots)
         
     return to_return
 
@@ -312,7 +339,7 @@ def indifferent(x, indifference):
     else:
         return 0
 
-def quality_bootstrap(feasible_systems, headers, best_system_index, x=0.1, y = 0.95, nboots = 1000):
+def quality_bootstrap(feasible_systems, headers, best_system_index, x=0.1, y = 0.95, nboots = 1000, cores='s'):
     """
     1. Create differences of systems from best system
     2. Create nboots bootstrap datasets of the differences
@@ -326,9 +353,14 @@ def quality_bootstrap(feasible_systems, headers, best_system_index, x=0.1, y = 0
     x -- % tolerance of difference from best mean allowed (default = 0.1)
     y -- % of boostrap samples that must be within tolerance x of best mean (default = 0.95)
     nboots = number of bootstrap datasets to create (default = 1000)
-    
+    cores - single ('single' or 's') core or parallel ('p' or 'parallel') execution. (default = 's')
     """
     
+    valid_cores =['single', 'parallel', 's', 'p']
+
+    if cores.lower() not in valid_cores:
+        raise ValueError('Parameter @cores must be either set to single (default) or parrallel (or p)')
+
     #setup differences
     diffs =  pd.DataFrame(feasible_systems.values.T - np.array(feasible_systems[best_system_index])).T
     diffs.columns = headers
@@ -336,7 +368,12 @@ def quality_bootstrap(feasible_systems, headers, best_system_index, x=0.1, y = 0
     #create bootstrap datasets
     #resample_diffs = bs.resample_all_scenarios(diffs.values.T.tolist(), args)
     #df = cf.resamples_to_df(resample_diffs, nboots)
-    df = pd.DataFrame(multi_bootstrap_par(diffs.values.T, nboots).T)
+
+    if('single' == cores or 's' == cores):
+        df = pd.DataFrame(multi_bootstrap(diffs.values.T, nboots).T)
+    else:
+        df = pd.DataFrame(multi_bootstrap_par(diffs.values.T, nboots).T)
+
     df.columns = headers    
     
     #find systems that have y% of bootstrap samples within x% of the best mean
