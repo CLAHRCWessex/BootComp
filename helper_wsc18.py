@@ -1,4 +1,5 @@
 import pandas as pd
+from Bootstrap_wsc18 import load_systems
 import os
 
 def load_model_file(filepath):
@@ -41,6 +42,31 @@ def best_subset_table(df_kpi, indexes, doe_file_name):
 
 
 
+def simulate_stage_2(take_forward, model_file):
+   df_wait_s2 = pd.DataFrame(load_systems(model_file[0]))[take_forward]
+   df_util_s2 = pd.DataFrame(load_systems(model_file[1]))[take_forward]
+   df_tran_s2 = pd.DataFrame(load_systems(model_file[2]))[take_forward]
+      
+   print("Loaded waiting time data. {0} systems; {1} replications".format(df_wait_s2.shape[1], df_wait_s2.shape[0]))
+   print("Loaded utilzation data. {0} systems; {1} replications".format(df_util_s2.shape[1], df_util_s2.shape[0]))
+   print("Loaded transfers data. {0} systems; {1} replications".format(df_tran_s2.shape[1], df_tran_s2.shape[0]))
+   
+   return df_wait_s2,df_util_s2, df_tran_s2
 
+
+def simulate_stage_1(n_1, model):
+   system_data_wait = load_systems(model[0], exclude_reps = 50-n_1)
+   system_data_util = load_systems(model[1], exclude_reps = 50-n_1)
+   system_data_tran = load_systems(model[2], exclude_reps = 50-n_1)
+   
+   print("Loaded waiting time data. {0} systems; {1} replications".format(system_data_wait.shape[1], system_data_wait.shape[0]))
+   print("Loaded utilzation data. {0} systems; {1} replications".format(system_data_util.shape[1], system_data_util.shape[0]))
+   print("Loaded transfers data. {0} systems; {1} replications".format(system_data_tran.shape[1], system_data_tran.shape[0]))
+   
+   df_tran = pd.DataFrame(system_data_tran)
+   df_util = pd.DataFrame(system_data_util)
+   df_wait = pd.DataFrame(system_data_wait)
+   
+   return df_wait, df_util, df_tran
 
 
