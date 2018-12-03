@@ -1,4 +1,8 @@
-import pandas as pd     
+import pandas as pd
+import os
+
+def load_model_file(filepath):
+    return [filepath + "/" + f for f in os.listdir(filepath) if os.path.isfile(os.path.join(filepath, f))]
 
 def get_best_subset(dfs, labels, subset):
     """
@@ -27,14 +31,6 @@ def get_best_subset(dfs, labels, subset):
 
 def best_subset_table(df_kpi, indexes, doe_file_name):
     """
-    Returns a pandas DataFrame containing the subset of key performance measures
-    merged with a design of experiments file
-
-    Keyword arguments:
-    df_kpi -- Pandas DataFrame containing the (multilple) key performance metrics 
-    indexes -- List of indexes to return from @df_kpi
-    doe_file_name -- the path and filename to the design of experiment file (assume .csv)
-    
     """
     df_doe = pd.read_csv(doe_file_name, index_col='System')
     df_doe.index -= 1

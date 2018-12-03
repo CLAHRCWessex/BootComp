@@ -188,7 +188,7 @@ def bootstrap_chance_constraint_plain_vanilla(data, threshold, boot_args, gamma=
    
    
    
-def bootstrap_chance_constraint(data, threshold, nboots=1000, gamma=0.95, kind='lower'):
+def constraints_bootstrap(data, threshold, nboots=1000, gamma=0.95, kind='lower'):
     """
     Bootstrap a chance constraint for k systems and filter out systems 
     where p% of resamples are greater a threshold t.  
@@ -359,14 +359,11 @@ def within_x(diffs, x, y, systems, best_system_index, nboots):
     return df_within_limit.loc[df_within_limit['sum'] >= threshold].index
     
 
-def simulate_stage_2(take_forward, INPUT_DATA1, INPUT_DATA2, INPUT_DATA3):
-   df_wait_s2 = pd.DataFrame(load_systems(INPUT_DATA1))[take_forward]
-   df_util_s2 = pd.DataFrame(load_systems(INPUT_DATA2))[take_forward]
-   df_tran_s2 = pd.DataFrame(load_systems(INPUT_DATA3))[take_forward]
-   
-   #N_SCENARIOS = df_wait_s2.shape[1]
-   #N_REPS = df_wait_s2.shape[0]
-   
+def simulate_stage_2(take_forward, model_file):
+   df_wait_s2 = pd.DataFrame(load_systems(model_file[0]))[take_forward]
+   df_util_s2 = pd.DataFrame(load_systems(model_file[1]))[take_forward]
+   df_tran_s2 = pd.DataFrame(load_systems(model_file[2]))[take_forward]
+      
    print("Loaded waiting time data. {0} systems; {1} replications".format(df_wait_s2.shape[1], df_wait_s2.shape[0]))
    print("Loaded utilzation data. {0} systems; {1} replications".format(df_util_s2.shape[1], df_util_s2.shape[0]))
    print("Loaded transfers data. {0} systems; {1} replications".format(df_tran_s2.shape[1], df_tran_s2.shape[0]))
@@ -374,10 +371,10 @@ def simulate_stage_2(take_forward, INPUT_DATA1, INPUT_DATA2, INPUT_DATA3):
    return df_wait_s2,df_util_s2, df_tran_s2
 
 
-def simulate_stage_1(n_1, INPUT_DATA1, INPUT_DATA2, INPUT_DATA3):
-   system_data_wait = load_systems(INPUT_DATA1, exclude_reps = 50-n_1)
-   system_data_util = load_systems(INPUT_DATA2, exclude_reps = 50-n_1)
-   system_data_tran = load_systems(INPUT_DATA3, exclude_reps = 50-n_1)
+def simulate_stage_1(n_1, model):
+   system_data_wait = load_systems(model[0], exclude_reps = 50-n_1)
+   system_data_util = load_systems(model[1], exclude_reps = 50-n_1)
+   system_data_tran = load_systems(model[2], exclude_reps = 50-n_1)
    
    #N_SCENARIOS = system_data_wait.shape[1]
    #N_REPS = system_data_wait.shape[0]
