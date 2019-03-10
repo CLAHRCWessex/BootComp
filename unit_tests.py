@@ -278,7 +278,7 @@ def test_within_x_1():
     
     
 
-def test_indifference_array():
+def test_indifference_dataframe():
     '''This was complicated to test!
         
     Test
@@ -330,7 +330,7 @@ def test_indifference_array():
     for i in range(0, 2):
         expected[i, :] = 1
     
-    actual = bs.indifference_array(x, data, best_index, df_boots)
+    actual = bs.indifference_dataframe(x, data, best_index, df_boots)
     #actual is an pandas dataframe
     assert actual.equals(pd.DataFrame(expected.T))    
 

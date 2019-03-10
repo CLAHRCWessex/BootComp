@@ -267,16 +267,18 @@ def within_x(diffs, x, y, systems, best_system_index, nboots):
     Return x% of feasible_systems[best_system_index] in y% of the boostrap samples
     """
     #pylint: disable-msg=R0913
-    indifference = systems[best_system_index].mean() * x
-    df_indifference = diffs.applymap(lambda x: indifferent(x, indifference))
+
+    df_indifference = indifference_dataframe(x, systems, 
+                                             best_system_index, 
+                                             diffs)
     threshold = nboots * y
     df_within_limit = df_indifference.sum(0)
     df_within_limit = pd.DataFrame(df_within_limit, columns=['sum'])
     return df_within_limit.loc[df_within_limit['sum'] >= threshold].index
 
 
-def indifference_array(x, systems, best_system_index, diffs):
-    '''Returns a np.ndarray containing 1/0.  
+def indifference_dataframe(x, systems, best_system_index, diffs):
+    '''Returns a pandas dataframe containing 1/0.  
     1 = value is within x% of the best system mean
     0 = value is not within x% of the best system mean
     
