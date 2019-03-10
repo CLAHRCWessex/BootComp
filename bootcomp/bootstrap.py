@@ -201,7 +201,7 @@ def bootstrap(data, boots):
 def indifferent(x, indifference):
     """
     convert numbers to 0 or 1
-     1 = difference less than 0.244
+    1 = difference less than 0.244
     0 = difference greater than 0.244
     """
     if x <= indifference:
@@ -275,6 +275,17 @@ def within_x(diffs, x, y, systems, best_system_index, nboots):
     return df_within_limit.loc[df_within_limit['sum'] >= threshold].index
 
 
+def indifference_array(x, systems, best_system_index, diffs):
+    '''Returns a np.ndarray containing 1/0.  
+    1 = value is within x% of the best system mean
+    0 = value is not within x% of the best system mean
+    
+    Keyword arguments:
+    diffs -- DataFrame of bootstrap datasets of mean differences
+    '''
+    indifference = systems[best_system_index].mean() * x
+    df_indifference = diffs.applymap(lambda x: indifferent(x, indifference))
+    return df_indifference
 
 
 
