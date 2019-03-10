@@ -1,8 +1,6 @@
 # BootComp
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CLAHRCWessex/BootComp/master)
-[![License](https://img.shields.io/pypi/l/canvasapi.svg)](https://pypi.python.org/pypi/canvasapi)
-[![Python Versions](https://img.shields.io/pypi/pyversions/canvasapi.svg)](https://pypi.python.org/pypi/canvasapi)
 
 Created by:
 Christine Currie christine.currie@soton.ac.uk
