@@ -332,6 +332,41 @@ def test_indifference_dataframe():
     
     actual = bs.indifference_dataframe(x, data, best_index, df_boots)
     #actual is an pandas dataframe
-    assert actual.equals(pd.DataFrame(expected.T))    
+    assert actual.equals(pd.DataFrame(expected.T)) 
+    
+    
+def test_dataframe_to_sum_of_columns():
+    to_sum = np.arange(0, 50)
+    to_sum = np.reshape(to_sum, (5, 10))
+    
+    expected = np.zeros((1, 5), np.int64)
+    
+    for i in range(5):
+        expected[0, i] = np.arange(i*10, (i*10)+10).sum()
+
+    expected = pd.DataFrame(expected.T, columns=['sum'])
+    print('expected \n{}'.format(expected))
+    
+    actual = bs.dataframe_to_sum_of_columns(to_sum.T)
+    
+    print('actual\n{}'.format(actual))
+    assert actual.equals(expected)
+    
+    
+def test_indexes_meeting_quality_criteria():
+    df = pd.DataFrame([95, 100, 0, 0, 0, 100], columns=['sum'])
+    expected = [0, 1, 5]
+    boots = 100
+    y = 0.95
+    actual = bs.indexes_meeting_quality_criteria(y, boots, df)
+    assert expected == actual.tolist()
+    
+    
+
+
+
+
+
+    
 
        

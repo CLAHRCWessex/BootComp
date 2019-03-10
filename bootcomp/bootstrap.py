@@ -264,17 +264,22 @@ def quality_bootstrap(feasible_systems, headers, best_system_index,
 
 def within_x(diffs, x, y, systems, best_system_index, nboots):
     """
-    Return x% of feasible_systems[best_system_index] in y% of the boostrap samples
+    Return x% of feasible_systems[best_system_index] in y% of the 
+    boostrap samples
+    
+    Returns indexes of systems that meet quality criteria
     """
     #pylint: disable-msg=R0913
 
     df_indifference = indifference_dataframe(x, systems, 
                                              best_system_index, 
                                              diffs)
-    threshold = nboots * y
-    df_within_limit = df_indifference.sum(0)
-    df_within_limit = pd.DataFrame(df_within_limit, columns=['sum'])
-    return df_within_limit.loc[df_within_limit['sum'] >= threshold].index
+    
+    df_within_limit = dataframe_to_sum_of_columns(df_indifference)
+    
+    indexes = indexes_meeting_quality_criteria(y, nboots, df_within_limit)
+    
+    return indexes
 
 
 def indifference_dataframe(x, systems, best_system_index, diffs):
@@ -289,6 +294,28 @@ def indifference_dataframe(x, systems, best_system_index, diffs):
     df_indifference = diffs.applymap(lambda x: indifferent(x, indifference))
     return df_indifference
 
+
+def dataframe_to_sum_of_columns(to_sum):
+    '''
+    Returns a dataframe that is the sum of the columns
+    of the argument to_sum
+    
+    keyword arguments:
+    to_sum -- pandas dataframe   
+    '''
+    arr = to_sum.sum(axis=0)
+    df = pd.DataFrame(arr, columns=['sum'])
+    return df
+    
+
+def indexes_meeting_quality_criteria(y, nboots, df_counts):
+    '''
+    Returns the indexes of the columns that meet the quality
+    criteria
+    '''
+    threshold = nboots * y
+    return df_counts.loc[df_counts['sum'] >= threshold].index
+    
 
 
 
