@@ -1,4 +1,9 @@
 # BootComp
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CLAHRCWessex/BootComp/master)
+[![License](https://img.shields.io/pypi/l/canvasapi.svg)](https://pypi.python.org/pypi/canvasapi)
+[![Python Versions](https://img.shields.io/pypi/pyversions/canvasapi.svg)](https://pypi.python.org/pypi/canvasapi)
+
 Created by:
 Christine Currie christine.currie@soton.ac.uk
 & Thomas Monks thomas.monks@soton.ac.uk 
@@ -25,19 +30,18 @@ Anaconda: https://www.anaconda.com/download/
 To get the correct libraries and versions in place.
 
 1. Windows -> Open Anaconda prompt.  Mac/linux -> Open a terminal
-2. Navigate to the BootComp directory
+2. Navigate to the BootComp/binder directory
 3. Run the following command:
     conda env create -f environment.yml
 
 
-This will fetch and install the libraries in a conda environment 'bootstrap'
+This will fetch and install the libraries in a conda environment 'bootcomp'
 
 4. To activate the bootcomp enviroment run the following command:
     conda activate bootcomp
     
 More help on environments can be found here: https://conda.io/docs/user-guide/tasks/manage-environments.html
     
-
 Intructions for use:
 
-BootComp includes a jupyter notebook tutorial: BootComp_WSC18.ipynb
+BootComp includes a jupyter notebook tutorial: BootComp_Tutorial.ipynb
