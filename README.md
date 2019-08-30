@@ -2,6 +2,8 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/CLAHRCWessex/BootComp/master)
 
+[![DOI](https://zenodo.org/badge/98512680.svg)](https://zenodo.org/badge/latestdoi/98512680)
+
 **Created by:**
 * Christine Currie christine.currie@soton.ac.uk
 * Thomas Monks thomas.monks@soton.ac.uk 
