@@ -211,7 +211,7 @@ def indifferent(x, indifference):
 
 
 def quality_bootstrap(feasible_systems, headers, best_system_index,
-                      beta=0.1, alpha=0.95, nboots=1000, cores='s'):
+                      alpha=0.95, beta=0.1, nboots=1000, cores='s'):
     """
     1. Create differences of systems from best system
     2. Create nboots bootstrap datasets of the differences
@@ -226,10 +226,10 @@ def quality_bootstrap(feasible_systems, headers, best_system_index,
 
     best_system_index -- index of the best system within @feasible_systems
 
-    beta -- % tolerance of difference from best mean allowed (default = 0.1)
-
     alpha -- % of boostrap samples that must be within tolerance x of
-        best mean (default = 0.95)
+            best mean (default = 0.95)
+
+    beta -- % tolerance of difference from best mean allowed (default = 0.1)
 
     nboots = number of bootstrap datasets to create (default = 1000)
 
