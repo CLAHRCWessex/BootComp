@@ -62,7 +62,7 @@ def constraints_bootstrap(data, threshold, nboots=1000,
     Keyword arguments:
     data -- a numpy array of the data to bootstrap
     threshold -- the threshold of the chance constraint
-    boot_args -- the bootstrap setup class
+    n_boots -- the number of bootstrap datasets to generate (default = 1000)
     gamma -- the probability cut off for the chance constraint (default p = 0.95)
     kind -- 'lower' = a lower limit threshold; 'upper' = an upper
              limit threshold (default = 'lower')
