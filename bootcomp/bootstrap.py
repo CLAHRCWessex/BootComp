@@ -100,6 +100,97 @@ def constraints_bootstrap(data, threshold, nboots=1000,
     return df_counts.loc[df_counts['pass'] == 1].index
 
 
+def constraints_bootstrap_r1(data, threshold, nboots=1000,
+                             gamma=0.95, kind='lower', cores='single'):
+    """
+    Bootstrap a chance constraint for k systems and filter out systems
+    where p% of resamples are greater a threshold t.
+
+    Example 1. A lower limit.  If the chance constaint was related to
+    utilization it could be stated as filter out any systems where 95% of
+    the distribution is greater than 80%.
+
+    Example 2. An upper limit.  If the chance constraint related to unwanted
+    ward transfers it could be stated as filter out any systems
+    where 95% of the distribution is less than 50 transfers per annum.
+
+    Returns a pandas.Series containing of the feasible systems
+    i.e. that do not violate the chance constraint.
+
+    Keyword arguments:
+    data -- a numpy array of the data to bootstrap
+    threshold -- the threshold of the chance constraint
+    n_boots -- the number of bootstrap datasets to generate (default = 1000)
+    gamma -- the probability cut off for the chance constraint (default p = 0.95)
+    kind -- 'lower' = a lower limit threshold; 'upper' = an upper
+             limit threshold (default = 'lower')
+    cores - single ('single' or 's') core or parallel ('p' or 'parallel')
+            execution. (default = 's')
+    """
+    #pylint: disable-msg=R0913
+
+    valid_operations = ['upper', 'lower']
+    valid_cores = ['single', 'parallel', 's', 'p']
+
+    if kind.lower() not in valid_operations:
+        raise ValueError('Parameter @kind must be either set to lower or upper')
+
+    if cores.lower() not in valid_cores:
+        msg = 'Parameter @cores must be either set to '
+        msg += 'single (default) or parrallel (or p)'
+        raise ValueError(msg)
+
+    if kind.lower() == 'lower':
+        kind = 1
+    else:
+        kind = 0
+
+    n = data[0].shape[0]
+
+    df_boots = pd.DataFrame(multi_bootstrap_constraint(data, 
+                                                        nboots,
+                                                        threshold,
+                                                        kind).T)
+    
+    df_boots.to_csv('df_boots.csv')
+
+    df_counts = pd.DataFrame(df_boots.sum(axis=0),columns={'count'})
+   
+    df_counts['prop'] = df_counts['count'] / (nboots * n)
+    df_counts['pass'] = np.where(df_counts['prop'] >= gamma, 1, 0)
+
+    return df_counts.loc[df_counts['pass'] == 1].index
+
+
+@jit(nopython=False)
+def multi_bootstrap_constraint(data, boots, threshold, kind):
+    """
+    Keyword arguments:
+    data -- numpy multi-dimentional array
+    boot -- number of bootstraps
+
+    Dev notes:
+    -------
+    This was added as part of revision 1 for the paper.  
+    Reviewer 2 noted that use of a mean bootstrap for a chance
+    constraint was unconventional.
+
+    """
+    designs = data.shape[0]
+
+    to_return = np.empty((designs, boots))
+
+    for design in range(designs):
+
+        to_return[design:design+1] = bootstrap_constraint(data[design], 
+                                                          boots,
+                                                          threshold,
+                                                          kind)
+
+    return to_return
+
+
+
 @jit(nopython=False)
 def multi_bootstrap(data, boots):
     """
@@ -193,6 +284,68 @@ def bootstrap(data, boots):
             total += data[np.random.randint(0, data.shape[0])]
 
         bs_data[boot] = total / data.shape[0]
+
+    return bs_data
+
+
+
+@jit(nopython=True)
+def bootstrap_constraint(data, boots, threshold, kind):
+    """
+    Create bootstrap datasets that represent the count of replications
+    different from a threhold.
+
+    Returns a numpy array containing the bootstrap datasets
+
+    Parameters:
+    --------
+    data -- np.ndarray
+         replications to boostrap
+    
+    boots -- int,
+        number of bootstraps
+    
+    threshold -- float,
+        the constraint
+
+    kind - int
+        0 = lower
+        1 = upper
+
+    Developer notes:
+
+    Function is optimised for Numba.
+
+    Could this be faster if was written in pure NumPy?
+    i.e no loops - then maybe wouldn't need numba dependency?
+
+    """
+    #negate the objective if chance constraint represents
+    #an upper bound
+    if kind == 0:
+        neg = -1
+    else:
+        neg = 1
+
+    #threshold *= neg
+    bs_data = np.empty(boots)
+
+    for boot in range(boots):
+
+        total = 0
+
+        for sample in range(data.shape[0]):
+
+            if kind == 1:
+
+                total += ((data[np.random.randint(0, 
+                                    data.shape[0])]) >= threshold)
+            else:
+                total += ((data[np.random.randint(0, 
+                                data.shape[0])]) <= threshold)
+
+
+        bs_data[boot] = total 
 
     return bs_data
 
